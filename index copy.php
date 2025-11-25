@@ -42,63 +42,12 @@ $stmtTesti = $pdo->query("
 ");
 $testimoni_terbaru = $stmtTesti->fetchAll();
 
-// Ambil data hero dari DB (tambahkan di awal index.php, setelah header)
-$stmtHero = $pdo->query("SELECT background_path, cta_button_text FROM hero_section WHERE id = 1");
-$heroData = $stmtHero->fetch(PDO::FETCH_ASSOC);
-$hero_bg = $heroData['background_path'] ?? 'assets/bg.jpg';
-$cta_text = $heroData['cta_button_text'] ?? 'Lihat Produk';
+// Hero background
+$hero_bg = file_exists(__DIR__ . '/assets/bg.jpg') 
+    ? 'assets/bg.jpg' 
+    : 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80';
 
-
-$stmtCaraPesan = $pdo->query("
-    SELECT title, subtitle FROM cara_pesan_section WHERE id = 1
-");
-$caraPesanSec = $stmtCaraPesan->fetch(PDO::FETCH_ASSOC);
-$cara_title = $caraPesanSec['title'] ?? 'Cara Pesan';
-$cara_subtitle = $caraPesanSec['subtitle'] ?? 'Mudah dan cepat, hanya dalam 4 langkah';
-
-$stmtSteps = $pdo->query("
-    SELECT * FROM cara_pesan_steps 
-    WHERE is_active = 1 
-    ORDER BY sort_order ASC, step_number ASC
-");
-$cara_steps = $stmtSteps->fetchAll();
-
-
-// --- AMBIL DATA KONTAK SECTION (title & subtitle) ---
-$stmtKontakSec = $pdo->prepare("SELECT title, subtitle FROM kontak_section WHERE id = 1");
-$stmtKontakSec->execute();
-$kontak_section = $stmtKontakSec->fetch(PDO::FETCH_ASSOC);
-if (!$kontak_section) {
-    $kontak_section = [
-        'title'    => 'Hubungi Kami',
-        'subtitle' => 'Siap melayani pesanan Anda dengan senang hati'
-    ];
-}
-
-// --- AMBIL CARD KONTAK AKTIF, DIURUTKAN ---
-$stmtCards = $pdo->prepare("
-    SELECT icon_class, title, label, href 
-    FROM contact_cards 
-    WHERE is_active = 1 
-    ORDER BY sort_order ASC, id ASC
-");
-$stmtCards->execute();
-$contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
-
-
-// --- AMBIL DATA FOOTER (SESUAI PREFERENSI: TERPISAH, SINGLE ROW) ---
-$stmtFooter = $pdo->prepare("SELECT main_text, copyright_text FROM footer_section WHERE id = 1 AND is_active = 1");
-$stmtFooter->execute();
-$footerData = $stmtFooter->fetch(PDO::FETCH_ASSOC);
-
-if (!$footerData) {
-    // fallback (aman & sesuai branding)
-    $footerData = [
-        'main_text' => 'Mendukung Expo Campus MAN 2 Samarinda',
-        'copyright_text' => '© 2025 <strong>Dapoer Funraise</strong>'
-    ];
-}
-
+$user = $_SESSION['username'] ?? null;
 ?>
 
 <!DOCTYPE html>
@@ -945,93 +894,98 @@ if (!$footerData) {
                 <li><a href="<?= htmlspecialchars($link['href']) ?>"><?= htmlspecialchars($link['label']) ?></a></li>
             <?php endforeach; ?>
         </ul>
+
+        <div class="button-area">
+            <?php if ($user): ?>
+                <a href="logout.php" class="nav-menu">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Keluar</span>
+                </a>
+                <a href="./admin/index.php" class="nav-menu">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            <?php else: ?>
+                <a href="login.php" class="nav-menu">
+                    <i class="fas fa-user"></i>
+                    <span>Masuk</span>
+                </a>
+            <?php endif; ?>
+        </div>
     </header>
 
     <main>
         <section id="beranda" class="fade-in">
             <div class="hero-content">
+                <h2 class="section-title">Dapoer <span class="highlight">Funraise</span></h2>
+                <p class="section-subtitle">Cemilan rumahan lezat, bergizi, dan mendukung kegiatan sosial sekolah.</p>
                 <a href="produk.php" class="btn btn-primary">
-                    <i class="fa-solid fa-cookie-bite"></i> <?= htmlspecialchars($cta_text) ?>
+                    <i class="fa-solid fa-cookie-bite"></i> Lihat Produk
                 </a>
             </div>
         </section>
 
         <section id="cara-pesan" class="fade-in">
-            <h2 class="section-title"><?= htmlspecialchars($cara_title) ?></h2>
-            <p class="section-subtitle"><?= htmlspecialchars($cara_subtitle) ?></p>
+            <h2 class="section-title">Cara Pesan</h2>
+            <p class="section-subtitle">Mudah dan cepat, hanya dalam 4 langkah</p>
             <div class="order-container">
-                <?php foreach ($cara_steps as $step): ?>
-                    <div class="order-card">
-                        <i class="fa-solid <?= htmlspecialchars($step['icon_class']) ?>"></i>
-                        <h3><?= htmlspecialchars($step['step_number']) ?>. <?= htmlspecialchars($step['title']) ?></h3>
-                        <p><?= htmlspecialchars($step['description']) ?></p>
-                    </div>
-                <?php endforeach; ?>
+                <div class="order-card">
+                    <i class="fa-solid fa-cookie-bite"></i>
+                    <h3>1. Lihat Produk</h3>
+                    <p>Jelajahi semua produk di halaman produk & pilih favorit Anda.</p>
+                </div>
+                <div class="order-card">
+                    <i class="fa-solid fa-cart-plus"></i>
+                    <h3>2. Tambah ke Keranjang</h3>
+                    <p>Klik “Tambah ke Keranjang” untuk simpan sementara pesanan.</p>
+                </div>
+                <div class="order-card">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <h3>3. Lihat & Atur Keranjang</h3>
+                    <p>Periksa isi keranjang, ubah jumlah, atau hapus produk dan isi detail pesanan.</p>
+                </div>
+                <div class="order-card">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <h3>4. Checkout ke WhatsApp</h3>
+                    <p>Klik “buat pesanan”, lalu pesan otomatis terkirim ke WhatsApp kami</p>
+                </div>
             </div>
         </section>
 
-        <?php
-        // --- AMAN: Ambil data tentang_kami_section ---
-        $stmtTentang = $pdo->prepare("SELECT title, subtitle, content FROM tentang_kami_section WHERE id = 1");
-        $stmtTentang->execute();
-        $tentang = $stmtTentang->fetch(PDO::FETCH_ASSOC);
-
-        // Jika belum ada data, gunakan fallback (sesuai preferensi Anda)
-        if (!$tentang) {
-            $tentang = [
-                'title'    => 'Tentang Kami',
-                'subtitle' => 'Dapur kecil, dampak besar untuk pendidikan',
-                'content'  => '
-                    Dapoer Funraise adalah wujud kepedulian alumni MAN 2 Samarinda dalam mendukung 
-                    <strong>Expo Campus MAN 2 Samarinda</strong> — acara tahunan untuk memperkenalkan perguruan tinggi kepada siswa.
-                    Seluruh keuntungan penjualan cemilan digunakan untuk kebutuhan acara: konsumsi, dekorasi, dan logistik.
-                    Kami percaya: bisnis kecil bisa berdampak besar!
-                '
-            ];
-        }
-
-        // --- AMAN: Ambil foto carousel aktif ---
-        $stmtPhotos = $pdo->prepare("
-            SELECT image_path, alt_text 
-            FROM carousel_photos 
-            WHERE is_active = 1 
-            ORDER BY sort_order ASC, id ASC
-        ");
-        $stmtPhotos->execute();
-        $photos = $stmtPhotos->fetchAll(PDO::FETCH_ASSOC);
-
-        // Fallback jika belum ada foto
-        if (empty($photos)) {
-            $photos = [
-                ['image_path' => 'assets/kegiatan1.jpg', 'alt_text' => 'Tim Dapoer Funraise'],
-                ['image_path' => 'assets/kegiatan2.jpg', 'alt_text' => 'Kegiatan Expo Campus 2024'],
-                ['image_path' => 'assets/kegiatan3.jpg', 'alt_text' => 'Proses pembuatan cemilan'],
-                ['image_path' => 'assets/kegiatan4.jpg', 'alt_text' => 'Distribusi cemilan ke acara']
-            ];
-        }
-        ?>
-
         <section id="tentang-kami" class="fade-in">
-            <h2 class="section-title"><?= htmlspecialchars($tentang['title']) ?></h2>
-            <p class="section-subtitle"><?= htmlspecialchars($tentang['subtitle']) ?></p>
+            <h2 class="section-title">Tentang Kami</h2>
+            <p class="section-subtitle">Dapur kecil, dampak besar untuk pendidikan</p>
             <div class="about-content-wrapper">
                 <div class="about-content">
                     <p>
-                        <?= $tentang['content'] ?>
+                        Dapoer Funraise adalah wujud kepedulian alumni MAN 2 Samarinda dalam mendukung 
+                        <strong>Expo Campus MAN 2 Samarinda</strong> — acara tahunan untuk memperkenalkan perguruan tinggi kepada siswa.
+                        Seluruh keuntungan penjualan cemilan digunakan untuk kebutuhan acara: konsumsi, dekorasi, dan logistik.
+                        Kami percaya: bisnis kecil bisa berdampak besar!
                     </p>
                 </div>
                 <div class="photo-carousel">
                     <div class="carousel-wrapper" id="carouselWrapper">
-                        <?php foreach ($photos as $p): ?>
-                            <div class="carousel-slide">
-                                <div class="photo-grid">
-                                    <div class="photo-item">
-                                        <img src="<?= htmlspecialchars($p['image_path']) ?>" 
-                                            alt="<?= htmlspecialchars($p['alt_text']) ?>">
-                                    </div>
-                                </div>
+                        <div class="carousel-slide">
+                            <div class="photo-grid">
+                                <div class="photo-item"><img src="assets/kegiatan1.jpg" alt="Foto Kegiatan 1"></div>
                             </div>
-                        <?php endforeach; ?>
+                        </div>
+                        <div class="carousel-slide">
+                            <div class="photo-grid">
+                                <div class="photo-item"><img src="assets/kegiatan2.jpg" alt="Foto Kegiatan 2"></div>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <div class="photo-grid">
+                                <div class="photo-item"><img src="assets/kegiatan3.jpg" alt="Foto Kegiatan 3"></div>
+                            </div>
+                        </div>
+                        <div class="carousel-slide">
+                            <div class="photo-grid">
+                                <div class="photo-item"><img src="assets/kegiatan4.jpg" alt="Foto Kegiatan 4"></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="carousel-nav">
                         <button class="carousel-btn" id="prevBtn" aria-label="Foto sebelumnya">
@@ -1122,58 +1076,29 @@ if (!$footerData) {
             </div>
         </section>
 
-        <?php
-        // --- AMBIL DATA KONTAK SECTION (title & subtitle) ---
-        $stmtKontakSec = $pdo->prepare("SELECT title, subtitle FROM kontak_section WHERE id = 1");
-        $stmtKontakSec->execute();
-        $kontak_section = $stmtKontakSec->fetch(PDO::FETCH_ASSOC);
-        if (!$kontak_section) {
-            $kontak_section = [
-                'title'    => 'Hubungi Kami',
-                'subtitle' => 'Siap melayani pesanan Anda dengan senang hati'
-            ];
-        }
-
-        // --- AMBIL CARD KONTAK AKTIF, DIURUTKAN ---
-        $stmtCards = $pdo->prepare("
-            SELECT icon_class, title, label, href 
-            FROM contact_cards 
-            WHERE is_active = 1 
-            ORDER BY sort_order ASC, id ASC
-        ");
-        $stmtCards->execute();
-        $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
-        ?>
-
         <section id="kontak" class="fade-in">
-            <h2 class="section-title"><?= htmlspecialchars($kontak_section['title']) ?></h2>
-            <p class="section-subtitle"><?= htmlspecialchars($kontak_section['subtitle']) ?></p>
+            <h2 class="section-title">Hubungi Kami</h2>
+            <p class="section-subtitle">Siap melayani pesanan Anda dengan senang hati</p>
             <div class="contact-cards">
-                <?php if ($contact_cards): ?>
-                    <?php foreach ($contact_cards as $card): ?>
-                        <?php
-                        $isWhatsApp = stripos(strtolower($card['icon_class']), 'whatsapp') !== false;
-                        $linkClass = $isWhatsApp ? 'whatsapp-btn' : '';
-                        ?>
-                        <div class="contact-card">
-                            <div class="card-icon">
-                                <i class="fa <?= htmlspecialchars($card['icon_class']) ?>"></i>
-                            </div>
-                            <div class="card-title"><?= htmlspecialchars($card['title']) ?></div>
-                            <a href="<?= htmlspecialchars($card['href']) ?>"
-                            class="contact-link <?= $linkClass ?>"
-                            target="_blank"
-                            rel="noopener noreferrer">
-                                <?= htmlspecialchars($card['label']) ?>
-                            </a>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="no-testimoni" style="grid-column: 1 / -1;">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <p>Belum ada kontak yang aktif. Silakan tambahkan via halaman admin.</p>
-                    </div>
-                <?php endif; ?>
+                <div class="contact-card">
+                    <div class="card-icon"><i class="fa-brands fa-whatsapp"></i></div>
+                    <div class="card-title">WhatsApp</div>
+                    <a href="https://wa.me/6283129704643" class="contact-link whatsapp-btn" target="_blank" rel="noopener noreferrer">Yunisa</a>
+                </div>
+                <div class="contact-card">
+                    <div class="card-icon"><i class="fa-brands fa-instagram"></i></div>
+                    <div class="card-title">Instagram</div>
+                    <a href="https://instagram.com/dapoerfunraise" class="contact-link whatsapp-btn" target="_blank">@dapoerfunraise</a>
+                </div>
+                <div class="contact-card">
+                    <div class="card-icon"><i class="fa-solid fa-location-dot"></i></div>
+                    <div class="card-title">Alamat</div>
+                    <a href="https://maps.google.com/?q=Jl.+Harmonika+No.+98,+Samarinda,+Kalimantan+Timur" 
+                        target="_blank" 
+                        class="contact-link whatsapp-btn">
+                        <i class="fa-solid fa-map-location-dot"></i> Buka di Google Maps
+                    </a>
+                </div>
             </div>
         </section>
 
@@ -1186,10 +1111,7 @@ if (!$footerData) {
     </main>
 
     <footer>
-        <p>
-            <?= $footerData['copyright_text'] ?> — 
-            <?= htmlspecialchars($footerData['main_text']) ?>
-        </p>
+        <p>© 2025 <strong>Dapoer Funraise</strong> — Mendukung Expo Campus MAN 2 Samarinda</p>
     </footer>
 
     <script>

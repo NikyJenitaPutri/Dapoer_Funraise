@@ -253,7 +253,13 @@ $tahun_ini = date('Y');
                 <i class="mdi mdi-comment-text-outline menu-icon"></i>
               </a>
             </li>
-          </ul>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showSection('pengaturan'); return false;">
+                <span class="menu-title">PENGATURAN</span>
+                <i class="mdi mdi-cog-outline menu-icon"></i>
+              </a>
+            </li>
         </nav>
 
         <!-- Main Content -->
