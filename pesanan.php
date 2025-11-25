@@ -135,6 +135,14 @@ function renderProduk($produkJson) {
     
     return $items ? implode("\n", $items) : '<div class="produk-item">—</div>';
 }
+
+// Array untuk icon status
+$statusIcons = [
+    'baru' => 'clock',
+    'diproses' => 'sync-alt',
+    'selesai' => 'check-circle',
+    'batal' => 'ban'
+];
 ?>
 
 <!DOCTYPE html>
@@ -386,6 +394,8 @@ function renderProduk($produkJson) {
             font-weight: 600;
             white-space: nowrap;
             border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
         }
 
         .status-baru { background: #e3f2fd; color: #1565c0; border-color: #bbdefb; }
@@ -680,6 +690,7 @@ function renderProduk($produkJson) {
                             <div class="order-time"><?= date('d M Y • H:i', strtotime($o['created_at'])) ?></div>
                         </div>
                         <span class="status-badge status-<?= htmlspecialchars($o['status']) ?>">
+                            <i class="fas fa-<?= $statusIcons[$o['status']] ?? 'question-circle' ?>"></i>
                             <?= [
                                 'baru' => 'Baru',
                                 'diproses' => 'Diproses',
@@ -708,7 +719,7 @@ function renderProduk($produkJson) {
                         <div class="total">Rp <?= number_format($o['total'], 0, ',', '.') ?></div>
                     </div>
                     <div class="order-footer">
-                        <form method="POST">
+                        <form method="POST" onsubmit="return confirm('Yakin ingin mengubah status pesanan #<?= (int)$o['id'] ?>?')">
                             <input type="hidden" name="id" value="<?= (int)$o['id'] ?>">
                             <select name="status">
                                 <option value="baru" <?= $o['status'] === 'baru' ? 'selected' : '' ?>>Baru</option>

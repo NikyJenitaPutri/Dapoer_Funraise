@@ -294,6 +294,13 @@ $tahun_ini = $tahun_pilihan;
                 <i class="mdi mdi-home menu-icon"></i>
               </a>
             </li>
+            <!-- 📊 MENU LAPORAN KEUANGAN BARU -->
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showSection('laporan'); return false;">
+                <span class="menu-title">Laporan Keuangan</span>
+                <i class="mdi mdi-file-document-box menu-icon"></i>
+              </a>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="#" onclick="showSection('produk'); return false;">
                 <span class="menu-title">Daftar Produk</span>
@@ -458,6 +465,33 @@ $tahun_ini = $tahun_pilihan;
               </div>
             </div>
 
+            <!-- 📊 SECTION LAPORAN KEUANGAN BARU -->
+            <div id="laporan-section" class="content-section">
+              <div class="page-header">
+                <h3 class="page-title">
+                  <span class="page-title-icon bg-gradient-primary text-white me-2">
+                    <i class="mdi mdi-file-document-box"></i>
+                  </span> Laporan Keuangan
+                </h3>
+                <nav aria-label="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li class="breadcrumb-item active" aria-current="page">
+                      <span></span>Laporan Penjualan per Bulan
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+              <div class="row">
+                <div class="col-12">
+                  <div class="card iframe-card">
+                    <div class="card-body">
+                      <iframe src="laporan_keuangan.php" class="iframe-container" frameborder="0" scrolling="auto" loading="lazy" title="Laporan Keuangan"></iframe>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Daftar Produk -->
             <div id="produk-section" class="content-section">
               <div class="page-header">
@@ -601,9 +635,12 @@ $tahun_ini = $tahun_pilihan;
         const target = document.getElementById(section + '-section');
         if (target) target.classList.add('active');
         
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        const clickedItem = event?.target.closest('.nav-item');
-        if (clickedItem) clickedItem.classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(el => {
+          el.classList.remove('active');
+          if (el.querySelector(`[onclick="showSection('${section}')"]`)) {
+            el.classList.add('active');
+          }
+        });
       }
 
       document.getElementById('bannerClose')?.addEventListener('click', function() {
