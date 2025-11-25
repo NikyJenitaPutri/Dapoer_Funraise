@@ -294,11 +294,11 @@ $tahun_ini = $tahun_pilihan;
                 <i class="mdi mdi-home menu-icon"></i>
               </a>
             </li>
-            <!-- 📊 MENU LAPORAN KEUANGAN BARU -->
+            <!-- 📊 MENU LAPORAN KEUANGAN BARU DENGAN ICON -->
             <li class="nav-item">
               <a class="nav-link" href="#" onclick="showSection('laporan'); return false;">
                 <span class="menu-title">Laporan Keuangan</span>
-                <i class="mdi mdi-file-document-box menu-icon"></i>
+                <i class="mdi mdi-chart-bar menu-icon"></i>
               </a>
             </li>
             <li class="nav-item">
@@ -470,7 +470,7 @@ $tahun_ini = $tahun_pilihan;
               <div class="page-header">
                 <h3 class="page-title">
                   <span class="page-title-icon bg-gradient-primary text-white me-2">
-                    <i class="mdi mdi-file-document-box"></i>
+                    <i class="mdi mdi-chart-bar"></i>
                   </span> Laporan Keuangan
                 </h3>
                 <nav aria-label="breadcrumb">
