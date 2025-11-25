@@ -99,6 +99,14 @@ if (!$footerData) {
     ];
 }
 
+$timeline_items = [
+            ['date' => 'AUG 2024', 'desc' => 'Ide Awal Fundraising'],
+            ['date' => 'NOV 2024', 'desc' => 'Validasi Konsep Produk'],
+            ['date' => 'FEB 2025', 'desc' => 'Pembentukan Tim Inti'],
+            ['date' => 'MAR 2025', 'desc' => 'Dapoer Funraise Beroperasi'],
+            ['date' => 'MAY 2025', 'desc' => 'Laporan Keuntungan Final']
+        ];
+
 ?>
 
 <!DOCTYPE html>
@@ -305,7 +313,7 @@ if (!$footerData) {
 
         /* === SECTIONS === */
         section {
-            min-height: 100vh;
+            min-height: 85vh;
             padding: 100px 20px;
             display: flex;
             flex-direction: column;
@@ -314,7 +322,7 @@ if (!$footerData) {
             scroll-snap-align: start;
         }
         .section-title {
-            font-size: 3.2rem;
+            font-size: 3rem;
             font-weight: 800;
             margin-bottom: 1.2rem;
             text-align: center;
@@ -497,6 +505,7 @@ if (!$footerData) {
 
         /* === TESTIMONI & FORM COMBINED === */
         #testimoni-section {
+            
             background: linear-gradient(135deg, var(--purple-light), var(--cream));
             padding: 80px 20px;
         }
@@ -679,8 +688,176 @@ if (!$footerData) {
         /* === TENTANG KAMI === */
         #tentang-kami {
             background: white;
-            padding: 60px 20px;
+            padding: 40px 20px;
         }
+        /* NEW: Timeline Section - Ringkas & SATU BARIS */
+        /* Hapus semua style box yang tidak diperlukan */
+        /* Kontainer Utama Timeline */
+       /* Kontainer Utama Timeline */
+        
+      /* --- KODE CSS LENGKAP UNTUK TIMELINE --- */
+        
+        /* Kontainer Utama Timeline */
+        .timeline-container {
+            display: flex; 
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            gap: 1px;
+            padding-top: 7px; 
+            padding-bottom: 10px;
+            overflow-x: hidden;
+            background: transparent;
+            border: none;
+            position: relative; 
+            z-index: 1;
+            margin-bottom: 20px; 
+            /* Tambahkan padding kanan-kiri untuk ruang panah */
+            padding-left: 10px; 
+            padding-right: 10px;
+        }
+        
+        /* Garis Penghubung Horizontal (Menggunakan ::before pada kontainer) */
+        .timeline-container::before {
+            content: '';
+            position: absolute;
+            top: 40px; /* Posisi vertikal garis */
+            left: 10px; /* Dimulai setelah panah kiri */
+            right: 10px; /* Berakhir sebelum panah kanan */
+            height: 2px;
+            background: #e0e0e0;
+            z-index: -1;
+        }
+
+        /* Panah KANAN (Menggunakan ::after pada kontainer) */
+        .timeline-container::after {
+            content: '';
+            position: absolute;
+            top: 33px; /* 40px - 4px (agar panah di tengah garis) */
+            right: 10px; 
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 8px solid #e0e0e0; /* Panah menunjuk ke KIRI */
+            z-index: 0; 
+        }
+        
+        /* Panah KIRI (Menggunakan ::before pada elemen dot PERTAMA, tambahkan ini di bawah) */
+        .timeline-dot-item:first-child::before {
+            content: '';
+            position: absolute;
+            top: 33px; 
+            left: 10px; 
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-right: 8px solid #e0e0e0; /* Panah menunjuk ke KANAN */
+            z-index: 0;
+            transform: translateX(-100%); /* Dorong panah agar tepat di luar padding kiri kontainer */
+        }
+        
+        /* Koreksi margin dot agar tepat di tengah */
+        .timeline-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin: 30px auto 5px; /* Margin atas 30px agar dot berada di posisi 40px */
+            box-shadow: 0 0 0 4px rgba(182, 75, 98, 0.1);
+            transition: all 0.3s ease;
+        }
+        .timeline-dot-item.dot-active .timeline-dot {
+            background: var(--secondary);
+            box-shadow: 0 0 0 6px rgba(90, 70, 162, 0.3);
+            transform: scale(1.2);
+        }
+        .timeline-date {
+            display: block;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 3px;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+        .timeline-dot-item p {
+            font-size: 0.85rem;
+            line-height: 1.3;
+            color: #555;
+            margin: 0;
+            /* Memotong teks agar tidak terlalu panjang, jika diperlukan */
+            text-align: center;
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: normal;
+        }
+
+        /* KOREKSI: Wrapper Detail Box */
+        .timeline-detail-box-wrapper {
+            width: 100%;
+            /* Ganti height: auto; menjadi max-height: 0 dan overflow: hidden; */
+            max-height: 0; 
+            overflow: hidden; 
+            
+            margin-bottom: 0px; /* Set margin ke 0 saat tertutup */
+            position: relative;
+            
+            /* Tambahkan transisi untuk animasi tinggi */
+            transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), margin-bottom 0.4s;
+        }
+
+        /* NEW: Saat ada kotak detail yang aktif, wrapper menyesuaikan tinggi */
+        .timeline-detail-box-wrapper.active {
+             /* Nilai yang cukup besar untuk menampung konten kotak detail */
+            max-height: 500px; 
+            margin-bottom: 20px; /* Kembalikan margin agar ada jarak ke kotak teks di bawah */
+        }
+
+        .timeline-dot-item.clickable {
+            cursor: pointer; /* Menunjukkan bahwa item dapat diklik */
+        }
+
+        .timeline-detail-box {
+            /* Gaya Box */
+            background: var(--cream);
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 15px;
+            
+            /* HAPUS position: absolute; agar memakan ruang */
+            position: static; 
+            width: 100%; /* Mengisi lebar penuh */
+            
+            /* Animasi untuk transisi yang halus */
+            transition: opacity 0.3s ease-in-out;
+            z-index: 10;
+            margin-top: 15px; /* Tambahkan jarak ke timeline dot */
+        }
+
+        .timeline-detail-box.hidden {
+            display: none; /* Menyembunyikan secara default */
+            opacity: 0;
+        }
+        
+        /* NEW: Saat detail box aktif (bersamaan dengan wrapper aktif) */
+        .timeline-detail-box.active {
+            opacity: 1;
+            display: block; /* Pastikan display block agar terlihat */
+        }
+
+        .timeline-detail-box h4 {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        .timeline-detail-box p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #555;
+            margin-bottom: 0;
+        }
+        
         #tentang-kami .section-title {
             margin-bottom: 1.5rem;
         }
@@ -694,7 +871,7 @@ if (!$footerData) {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
-            align-items: center;
+            align-items: flex-start;
         }
         .about-content {
             background: white;
@@ -703,10 +880,10 @@ if (!$footerData) {
             box-shadow: var(--shadow-md);
         }
         .about-content p {
-            font-size: 1.15rem;
+            font-size: 1rem;
             line-height: 1.8;
             color: #444;
-            margin-bottom: 1.5rem;
+            margin-bottom: 0.5rem;
         }
 
         /* === PHOTO CAROUSEL === */
@@ -741,7 +918,7 @@ if (!$footerData) {
         .photo-item {
             width: 100%;
             max-width: 500px;
-            aspect-ratio: 4 / 3;
+            aspect-ratio: 16 / 10.8;
             overflow: hidden;
             border-radius: 12px;
         }
@@ -984,8 +1161,9 @@ if (!$footerData) {
                 'content'  => '
                     Dapoer Funraise adalah wujud kepedulian alumni MAN 2 Samarinda dalam mendukung 
                     <strong>Expo Campus MAN 2 Samarinda</strong> — acara tahunan untuk memperkenalkan perguruan tinggi kepada siswa.
-                    Seluruh keuntungan penjualan cemilan digunakan untuk kebutuhan acara: konsumsi, dekorasi, dan logistik.
+                    Seluruh keuntungan penjualan cemilan digunakan untuk kebutuhan acara. konsumsi, dekorasi, dan logistik.
                     Kami percaya: bisnis kecil bisa berdampak besar!
+                    
                 '
             ];
         }
@@ -1011,14 +1189,64 @@ if (!$footerData) {
         }
         ?>
 
+       <?php
+        // ... (Data $tentang, $photos)
+        
+        // --- TAMBAHAN: Data Timeline Sementara (PERLU DIPINDAH KE ATAS) ---
+       $timeline_items = [
+    // Tambahkan 'title' dan 'long_desc'
+    ['date' => 'AUG 2024', 'desc' => 'Ide Awal Fundraising', 'title' => 'Riset dan Perencanaan', 'long_desc' => 'Pada tahap ini, kami melakukan riset pasar dan membuat perencanaan awal untuk konsep penggalangan dana Expo Campus.'],
+    
+    // Contoh item lain:
+    ['date' => 'NOV 2024', 'desc' => 'Validasi Konsep Produk', 'title' => 'Pengembangan Konsep Awal', 'long_desc' => 'Kami mulai memvalidasi resep-resep cemilan andalan kami dan memastikan logistik untuk produksi massal.'],
+    
+    ['date' => 'FEB 2025', 'desc' => 'Pembentukan Tim Inti', 'title' => 'Tim dan Sumber Daya', 'long_desc' => 'Pembentukan tim inti yang solid, meliputi divisi produksi, pemasaran, dan keuangan.'],
+    
+    ['date' => 'MAR 2025', 'desc' => 'Dapoer Funraise Beroperasi', 'title' => 'Peluncuran Resmi', 'long_desc' => 'Dapoer Funraise resmi beroperasi, menerima pesanan untuk pertama kalinya.'],
+    
+    ['date' => 'MAY 2025', 'desc' => 'Laporan Keuntungan', 'title' => 'Laporan dan Donasi', 'long_desc' => 'Kami menyusun laporan keuangan dan menyerahkan donasi guna mendukung acara expo campus MAN 2 untuk pertama kalinya dan terus kami lakukan hingga sekarang.'],
+];
+        // --- AKHIR Data Timeline Sementara ---
+        ?>
+
         <section id="tentang-kami" class="fade-in">
             <h2 class="section-title"><?= htmlspecialchars($tentang['title']) ?></h2>
             <p class="section-subtitle"><?= htmlspecialchars($tentang['subtitle']) ?></p>
             <div class="about-content-wrapper">
-                <div class="about-content">
-                    <p>
-                        <?= $tentang['content'] ?>
-                    </p>
+                
+                <div class="about-left-column">
+                    
+                    <div class="timeline-container">
+                        <?php 
+                        $i = 0; // Tambahkan counter untuk ID
+                        foreach ($timeline_items as $item): ?>
+                            <div class="timeline-dot-item clickable" data-timeline-id="item-<?= $i ?>">
+                                <div class="timeline-dot"></div>
+                                <span class="timeline-date"><?= htmlspecialchars($item['date']) ?></span>
+                                <p><?= htmlspecialchars($item['desc']) ?></p>
+                            </div>
+                        <?php 
+                        $i++;
+                        endforeach; ?>
+                    </div>
+
+                    <div class="timeline-detail-box-wrapper">
+    <?php 
+    $j = 0; // Index untuk ID unik
+    foreach ($timeline_items as $item): ?>
+        <div class="timeline-detail-box hidden" id="detail-item-<?= $j ?>">
+            <h4><?= htmlspecialchars($item['title']) ?></h4>
+            <p><?= htmlspecialchars($item['long_desc']) ?></p> </div>
+    <?php 
+    $j++;
+    endforeach; ?>
+</div>
+                    
+                    <div class="about-content">
+                        <p>
+                            <?= $tentang['content'] ?>
+                        </p>
+                    </div>
                 </div>
                 <div class="photo-carousel">
                     <div class="carousel-wrapper" id="carouselWrapper">
@@ -1042,9 +1270,8 @@ if (!$footerData) {
                         </button>
                     </div>
                 </div>
-            </div>
+                </div>
         </section>
-
         <section id="testimoni-section" class="fade-in">
             <h2 class="section-title">Testimoni & Kirim Pesan</h2>
             <p class="section-subtitle">Dengar dari pelanggan kami dan bagikan pengalaman Anda!</p>
@@ -1315,6 +1542,8 @@ if (!$footerData) {
             btnBackToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
         }
 
+        
+
         // ▼▼▼ 9. ACCORDION TESTIMONI (3 item, rapi & interaktif) ▼▼▼
         document.querySelectorAll('.testimoni-accordion').forEach(acc => {
             const header = acc.querySelector('.accordion-header');
@@ -1333,6 +1562,43 @@ if (!$footerData) {
                 if (!isActive) {
                     acc.classList.add('active');
                     body.style.maxHeight = body.scrollHeight + 'px';
+                }
+            });
+        });
+
+
+        // ▼▼▼ 10. TIMELINE INTERAKTIF (DOT KE BOX) - KOREKSI FINAL: MENGHILANGKAN JARAK BESAR ▼▼▼
+        const timelineItems = document.querySelectorAll('.timeline-dot-item.clickable');
+        const wrapper = document.querySelector('.timeline-detail-box-wrapper');
+        
+        timelineItems.forEach((item) => {
+            item.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-timeline-id');
+                const targetBox = document.getElementById(`detail-${targetId}`);
+
+                if (!targetBox || !wrapper) return;
+
+                const isActive = targetBox.classList.contains('active');
+                
+                // 1. Tutup/Reset semua (Kotak Detail & Wrapper)
+                document.querySelectorAll('.timeline-detail-box').forEach(box => {
+                    box.classList.remove('active');
+                    box.classList.add('hidden');
+                });
+                wrapper.classList.remove('active'); 
+                
+                // 2. Hapus status aktif dari semua dot
+                timelineItems.forEach(dot => dot.classList.remove('dot-active'));
+                
+                if (!isActive) {
+                    // 3. Buka yang diklik
+                    targetBox.classList.remove('hidden');
+                    // Tambahkan timeout untuk transisi opacity (opsional)
+                    setTimeout(() => targetBox.classList.add('active'), 10); 
+                    
+                    // 4. Tandai dot sebagai aktif dan buka wrapper
+                    this.classList.add('dot-active');
+                    wrapper.classList.add('active'); 
                 }
             });
         });
