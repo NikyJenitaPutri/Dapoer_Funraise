@@ -487,6 +487,33 @@ $tahun_ini = date('Y');
             </div>
           </div>
 
+          <!-- Pengaturan -->
+          <div id="pengaturan-section" class="content-section">
+            <div class="page-header">
+              <h3 class="page-title">
+                <span class="page-title-icon bg-gradient-primary text-white me-2">
+                  <i class="mdi mdi-cog-outline"></i>
+                </span> Pengaturan
+              </h3>
+              <nav aria-label="breadcrumb">
+                <ul class="breadcrumb">
+                  <li class="breadcrumb-item active" aria-current="page">
+                    <span></span>Kelola Konten Website
+                  </li>
+                </ul>
+              </nav>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="card iframe-card">
+                  <div class="card-body">
+                    <iframe src="../pengaturan.php" class="iframe-container" frameborder="0" scrolling="auto" loading="lazy" title="Pengaturan"></iframe>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Footer -->
           <footer class="footer">
             <div class="d-sm-flex justify-content-center justify-content-sm-between">
