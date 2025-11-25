@@ -12,12 +12,26 @@ if (!isset($pdo) || !$pdo instanceof PDO) {
     die('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Error</title></head><body><div style="padding:2rem;max-width:600px;margin:2rem auto;background:#fee;border-radius:8px;color:#c00;font-family:sans-serif;"><h2>❌ Koneksi Database Gagal</h2><p>File <code>config.php</code> tidak menyediakan variabel <code>$pdo</code> yang valid.</p><p>Harap pastikan config.php berisi koneksi PDO ke database <strong>dapoer_funraise</strong>.</p></div></body></html>');
 }
 
-try {
-    // 🔹 Rentang BULAN INI (1st → last day)
-    $month_start = date('Y-m-01 00:00:00');
-    $month_end   = date('Y-m-t 23:59:59'); // 't' = last day of month
+// 🔹 AMBIL PARAMETER BULAN & TAHUN DARI GET (atau default ke bulan ini)
+$bulan_pilihan = isset($_GET['bulan']) ? (int)$_GET['bulan'] : (int)date('n');
+$tahun_pilihan = isset($_GET['tahun']) ? (int)$_GET['tahun'] : (int)date('Y');
 
-    // 🔹 Pendapatan BULAN INI: hanya dari pesanan 'selesai'
+// Validasi bulan (1-12)
+if ($bulan_pilihan < 1 || $bulan_pilihan > 12) {
+    $bulan_pilihan = (int)date('n');
+}
+
+// Validasi tahun (misal: 2020-2030)
+if ($tahun_pilihan < 2020 || $tahun_pilihan > 2030) {
+    $tahun_pilihan = (int)date('Y');
+}
+
+try {
+    // 🔹 Rentang BULAN PILIHAN (1st → last day)
+    $month_start = sprintf('%04d-%02d-01 00:00:00', $tahun_pilihan, $bulan_pilihan);
+    $month_end   = date('Y-m-t 23:59:59', strtotime($month_start)); // 't' = last day of month
+
+    // 🔹 Pendapatan BULAN PILIHAN: hanya dari pesanan 'selesai'
     $stmt = $pdo->prepare("
         SELECT COALESCE(SUM(total), 0) AS total_pendapatan
         FROM pesanan 
@@ -27,7 +41,7 @@ try {
     $stmt->execute(['start' => $month_start, 'end' => $month_end]);
     $pendapatan = (float) $stmt->fetchColumn();
 
-    // 🔹 ✅ PESANAN MASUK BULAN INI: SEMUA STATUS (baru, diproses, selesai, batal)
+    // 🔹 PESANAN MASUK BULAN PILIHAN: SEMUA STATUS
     $stmt = $pdo->prepare("
         SELECT COUNT(*) 
         FROM pesanan 
@@ -36,7 +50,7 @@ try {
     $stmt->execute(['start' => $month_start, 'end' => $month_end]);
     $pesanan_masuk = (int) $stmt->fetchColumn();
 
-    // 🔹 Pesanan Selesai BULAN INI
+    // 🔹 Pesanan Selesai BULAN PILIHAN
     $stmt = $pdo->prepare("
         SELECT COUNT(*) 
         FROM pesanan 
@@ -56,7 +70,7 @@ try {
     $stmt->execute();
     $jumlah_testimoni = (int) $stmt->fetchColumn();
 
-    // 🔹 ✅ PESANAN DIBATALKAN BULAN INI (bukan total!)
+    // 🔹 PESANAN DIBATALKAN BULAN PILIHAN
     $stmt = $pdo->prepare("
         SELECT COUNT(*) 
         FROM pesanan 
@@ -115,8 +129,8 @@ function namaBulan($bulan) {
     ];
     return $nama[(int)$bulan] ?? 'Bulan';
 }
-$bulan_ini = namaBulan(date('n'));
-$tahun_ini = date('Y');
+$bulan_ini = namaBulan($bulan_pilihan);
+$tahun_ini = $tahun_pilihan;
 ?>
 
 <!DOCTYPE html>
@@ -152,10 +166,55 @@ $tahun_ini = date('Y');
       .stat-card { min-height: 145px; }
       .card-subtitle {
         font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.95) !important; /* putih solid, sedikit transparan agar natural */
+        color: rgba(255, 255, 255, 0.95) !important;
         font-weight: 500;
         margin-bottom: 0;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.2); /* tambah depth agar tetap terbaca */
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      }
+      
+      /* 🎨 Style untuk Filter Bulan */
+      .filter-bulan-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #f8f9fa;
+        padding: 10px 15px;
+        border-radius: 6px;
+        border: 1px solid #e0e0e0;
+      }
+      .filter-bulan-wrapper select {
+        padding: 6px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background: white;
+        font-size: 14px;
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+      .filter-bulan-wrapper select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+      }
+      .filter-bulan-wrapper .btn-apply {
+        background: linear-gradient(to right, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 6px 20px;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .filter-bulan-wrapper .btn-apply:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      }
+      .filter-bulan-wrapper label {
+        margin: 0;
+        font-weight: 500;
+        color: #495057;
+        font-size: 14px;
       }
     </style>
   </head>
@@ -260,6 +319,7 @@ $tahun_ini = date('Y');
                 <i class="mdi mdi-cog-outline menu-icon"></i>
               </a>
             </li>
+          </ul>
         </nav>
 
         <!-- Main Content -->
@@ -284,13 +344,33 @@ $tahun_ini = date('Y');
                 <nav aria-label="breadcrumb">
                   <ul class="breadcrumb">
                     <li class="breadcrumb-item active" aria-current="page">
-                      <span></span>Laporan Bulanan: <?= $bulan_ini ?> <?= $tahun_ini ?>
+                      <!-- 🎯 FORM FILTER BULAN -->
+                      <form method="GET" action="" class="filter-bulan-wrapper" id="filterForm">
+                        <label><i class="mdi mdi-calendar"></i> Laporan:</label>
+                        <select name="bulan" id="selectBulan">
+                          <?php for ($i = 1; $i <= 12; $i++): ?>
+                            <option value="<?= $i ?>" <?= $i == $bulan_pilihan ? 'selected' : '' ?>>
+                              <?= namaBulan($i) ?>
+                            </option>
+                          <?php endfor; ?>
+                        </select>
+                        <select name="tahun" id="selectTahun">
+                          <?php for ($y = 2020; $y <= 2030; $y++): ?>
+                            <option value="<?= $y ?>" <?= $y == $tahun_pilihan ? 'selected' : '' ?>>
+                              <?= $y ?>
+                            </option>
+                          <?php endfor; ?>
+                        </select>
+                        <button type="submit" class="btn-apply">
+                          <i class="mdi mdi-filter"></i> Terapkan
+                        </button>
+                      </form>
                     </li>
                   </ul>
                 </nav>
               </div>
 
-              <!-- ✅ ENAM KARTU — SEMUA SUDAH SESUAI -->
+              <!-- ✅ ENAM KARTU -->
               <div class="row">
                 <!-- Kartu 1: Pendapatan -->
                 <div class="col-md-4 stretch-card grid-margin stat-card">
@@ -334,7 +414,7 @@ $tahun_ini = date('Y');
                   </div>
                 </div>
 
-                <!-- Kartu 4: Pesanan Masuk (SEMUA STATUS, BULAN INI) -->
+                <!-- Kartu 4: Pesanan Masuk -->
                 <div class="col-md-4 stretch-card grid-margin stat-card">
                   <div class="card bg-gradient-warning card-img-holder text-white">
                     <div class="card-body">
@@ -348,8 +428,7 @@ $tahun_ini = date('Y');
                   </div>
                 </div>
 
-                <!-- Kartu 5: Pesanan Selesai (BULAN INI) -->
-                <!-- ✅ DIPERBAIKI: ganti dari 'bg-gradient-teal' ke 'bg-gradient-success' -->
+                <!-- Kartu 5: Pesanan Selesai -->
                 <div class="col-md-4 stretch-card grid-margin stat-card">
                   <div class="card bg-gradient-primary card-img-holder text-white">
                     <div class="card-body">
@@ -363,7 +442,7 @@ $tahun_ini = date('Y');
                   </div>
                 </div>
 
-                <!-- Kartu 6: Pesanan Dibatalkan (BULAN INI) -->
+                <!-- Kartu 6: Pesanan Dibatalkan -->
                 <div class="col-md-4 stretch-card grid-margin stat-card">
                   <div class="card bg-gradient-dark card-img-holder text-white">
                     <div class="card-body">
@@ -377,32 +456,6 @@ $tahun_ini = date('Y');
                   </div>
                 </div>
               </div>
-
-              <!-- Grafik
-              <div class="row">
-                <div class="col-md-7 grid-margin stretch-card">
-                  <div class="card">
-                    <div class="card-body">
-                      <div class="clearfix">
-                        <h4 class="card-title float-start">Statistik Pesanan Bulanan</h4>
-                        <div id="visit-sale-chart-legend" class="rounded-legend legend-horizontal legend-top-right float-end"></div>
-                      </div>
-                      <canvas id="visit-sale-chart" class="mt-4"></canvas>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-5 grid-margin stretch-card">
-                  <div class="card">
-                    <div class="card-body">
-                      <h4 class="card-title">Top 3 Produk Terjual</h4>
-                      <div class="doughnutjs-wrapper d-flex justify-content-center">
-                        <canvas id="traffic-chart"></canvas>
-                      </div>
-                      <div id="traffic-chart-legend" class="rounded-legend legend-vertical legend-bottom-left pt-4"></div>
-                    </div>
-                  </div>
-                </div>
-              </div> -->
             </div>
 
             <!-- Daftar Produk -->
@@ -485,35 +538,37 @@ $tahun_ini = date('Y');
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Pengaturan -->
-          <div id="pengaturan-section" class="content-section">
-            <div class="page-header">
-              <h3 class="page-title">
-                <span class="page-title-icon bg-gradient-primary text-white me-2">
-                  <i class="mdi mdi-cog-outline"></i>
-                </span> Pengaturan
-              </h3>
-              <nav aria-label="breadcrumb">
-                <ul class="breadcrumb">
-                  <li class="breadcrumb-item active" aria-current="page">
-                    <span></span>Kelola Konten Website
-                  </li>
-                </ul>
-              </nav>
-            </div>
-            <div class="row">
-              <div class="col-12">
-                <div class="card iframe-card">
-                  <div class="card-body">
-                    <iframe src="../pengaturan.php" class="iframe-container" frameborder="0" scrolling="auto" loading="lazy" title="Pengaturan"></iframe>
+              <!-- Pengaturan -->
+              <div id="pengaturan-section" class="content-section">
+                <div class="page-header">
+                  <h3 class="page-title">
+                    <span class="page-title-icon bg-gradient-primary text-white me-2">
+                      <i class="mdi mdi-cog-outline"></i>
+                    </span> Pengaturan
+                  </h3>
+                  <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb">
+                      <li class="breadcrumb-item active" aria-current="page">
+                        <span></span>Kelola Konten Website
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+                <div class="row">
+                  <div class="col-12">
+                    <div class="card iframe-card">
+                      <div class="card-body">
+                        <iframe src="../pengaturan.php" class="iframe-container" frameborder="0" scrolling="auto" loading="lazy" title="Pengaturan"></iframe>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+
           </div>
 
+          
           <!-- Footer -->
           <footer class="footer">
             <div class="d-sm-flex justify-content-center justify-content-sm-between">
