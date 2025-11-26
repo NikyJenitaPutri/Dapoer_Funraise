@@ -78,22 +78,14 @@ $msg = $_GET['msg'] ?? '';
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: var(--bg);
+            background: #f1e8fdff;
             color: var(--text);
             line-height: 1.5;
             margin: 0;
             padding: 0;
             width: 100vw;
         }
-
-        /* ✅ FULL-WIDTH LAYOUT
-        .full-bleed {
-            width: 100vw;
-            margin-left: calc(-50vw + 50%);
-            padding-left: clamp(1rem, 2vw, 3rem);
-            padding-right: clamp(1rem, 2vw, 3rem);
-        } */
-
+        
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -367,7 +359,6 @@ $msg = $_GET['msg'] ?? '';
 
     <div class="controls">
         <div class="search-box">
-            <i class="fas fa-search" style="margin-top: 6px; color: #888;"></i>
             <input type="text" id="searchInput" class="search-input" placeholder="Cari nama, produk, atau komentar...">
         </div>
 

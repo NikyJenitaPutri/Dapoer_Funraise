@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Foto — Admin</title>
+    <title>Tambah Foto — Dapoer Funraise</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -59,7 +59,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --primary: #5A46A2;
             --secondary: #B64B62;
             --accent: #F9CC22;
-            --bg-light: #FFF5EE;
             --soft: #DFBEE0;
             --text-muted: #9180BB;
         }
@@ -96,7 +95,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 5px 20px rgba(90, 70, 162, 0.1);
             overflow: hidden;
             border: 1px solid #f0eaff;
-            margin: 0;
             border-radius: 0;
         }
 
@@ -107,7 +105,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 5px 20px rgba(90, 70, 162, 0.1);
             overflow: hidden;
             border: 1px solid #f0eaff;
-            margin: 0;
             border-radius: 0;
         }
 
@@ -119,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .form-header, .preview-header {
-            background: linear-gradient(120deg, #f5f3ff, #faf5ff);
+            background: #faf5ff;
             padding: 0.9rem 1.4rem;
             font-size: 1.2rem;
             font-weight: 600;
@@ -240,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-top: 1px solid #f3f0ff;
             display: flex;
             gap: 10px;
-            margin-top: 0;
+            margin-top: auto;
         }
 
         @media (max-width: 768px) {
@@ -278,41 +275,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 3px 10px rgba(182, 75, 98, 0.25);
         }
 
-        .btn-gray {
-            background: linear-gradient(135deg, #e0e0e0, #cfcfcf);
-            color: #555;
+        .btn-secondary, .btn-gray {
+            background: linear-gradient(135deg, var(--soft), #c8a5d0);
+            color: var(--primary);
             flex: 1;
         }
 
-        .btn-gray:hover {
-            background: linear-gradient(135deg, #d0d0d0, #bdbdbd);
+        .btn-secondary:hover, .btn-gray:hover {
+            background: linear-gradient(135deg, #d0a8d5, #c095cb);
         }
 
-        /* Preview box */
+        /* ✅ PREVIEW TANPA CARD DALAM CARD */
         .preview-body {
             padding: 1.5rem 1.2rem;
-            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1.1rem;
-        }
-
-        .preview-image-container {
-            width: 250px;
-            height: 250px;
-            border-radius: 12px;
-            background: white;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-            overflow: hidden;
+            gap: 16px;
         }
 
         .preview-image {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 250px;
+            max-height: 250px;
             object-fit: contain;
         }
 
@@ -320,7 +305,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 0.95rem;
             font-weight: 600;
             color: var(--primary);
-            margin-top: 8px;
         }
 
         .preview-sort {
@@ -392,8 +376,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="action-bar">
-                <a href="tentang_kami.php" class="btn btn-gray">
-                    <i class="fas fa-arrow-left"></i> Batal
+                <a href="tentang_kami.php" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
                 </a>
                 <button type="submit" form="uploadForm" class="btn btn-primary">
                     <i class="fas fa-upload"></i> Unggah & Simpan
@@ -401,12 +385,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <!-- Preview Box -->
+        <!-- ✅ Preview tanpa card dalam card -->
         <div class="preview-box">
             <div class="preview-header">
                 <i class="fas fa-eye"></i> Preview
             </div>
             <div class="preview-body">
+                <!-- Langsung tampilkan elemen preview -->
                 <div class="preview-image-container">
                     <img 
                         src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250' viewBox='0 0 250 250'%3E%3Crect width='250' height='250' fill='%23faf9ff'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle' font-family='Poppins' font-size='14' fill='%239180BB'%3ETidak ada gambar%3C/text%3E%3C/svg%3E"
@@ -415,8 +400,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         id="previewImage"
                     >
                 </div>
-                <div class="preview-alt" id="previewAlt">—</div>
-                <div class="preview-sort" id="previewSort">Urutan: —</div>
+                <div class="preview-alt" id="previewAlt">Nama Foto</div>
+                <div class="preview-sort" id="previewSort">Urutan: </div>
             </div>
         </div>
     </div>

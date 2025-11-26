@@ -92,338 +92,392 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Tambah Produk — Dapoer Funraise</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
-:root {
-    --primary: #5A46A2;
-    --secondary: #B64B62;
-    --accent: #F9CC22;
-    --bg-light: #FFF5EE;
-    --soft: #DFBEE0;
-    --text-muted: #9180BB;
-    --border: #f0eaff;
-    --shadow: 0 4px 12px rgba(90, 70, 162, 0.1);
-    
-    --fs-xs: 0.8125rem;
-    --fs-sm: 0.875rem;
-    --fs-md: 0.9375rem;
-    --fs-lg: 1rem;
-    --gap-xs: 0.4rem;
-    --gap-sm: 0.6rem;
-    --gap-md: 0.8rem;
-    --gap-lg: 1rem;
-    --radius: 8px;
-    --btn-h: 38px;
-}
+        :root {
+            --primary: #5A46A2;
+            --secondary: #B64B62;
+            --accent: #F9CC22;
+            --soft: #DFBEE0;
+            --text-muted: #9180BB;
+            --border: #e8e6f2;
+            --bg-light: #faf9ff;
+        }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-html, body {
-    width: 100%;
-    min-width: 100vw;
-    overflow-x: hidden; /* Hanya jika benar-benar diperlukan, karena bisa batasi zoom */
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background: #faf9ff;
-    color: #333;
-    margin: 0; /* ← pastikan tidak ada padding/margin di body */
-    font-size: var(--fs-md);
-    line-height: 1.5;
-    min-width: 100vw; /* ← sangat penting untuk zoom */
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f1e8fdff;
+            color: #333;
+            font-size: 15px;
+            min-height: 100vh;
+            margin:0;
+            padding: 0;
+        }
 
-.main-wrapper {
-    display: flex;
-    gap: var(--gap-md);
-    width: 100%;
-    min-width: 100vw; /* ← agar tidak menyusut saat zoom out */
-    margin: 0 auto;
-    padding: 0; /* opsional: untuk jarak halus di samping */
-}
+        .main-wrapper {
+            display: flex;
+            gap: 1px;
+            width: 100%;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 5px 30px rgba(90, 70, 162, 0.12);
+            border-radius: 16px;
+            overflow: hidden;
+        }
 
-.form-box,
-.preview-box {
-    background: white;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-    overflow: hidden;
-}
+        @media (max-width: 768px) {
+            .main-wrapper {
+                flex-direction: column;
+            }
+            
+            body {
+                padding: 20px 10px;
+            }
+        }
 
-.form-header {
-    background: #f9f7ff;
-    color: var(--primary);
-    padding: 0.6rem 1rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
+        .form-box {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
 
-.form-body {
-    padding: var(--gap-sm);
-}
+        .preview-box {
+            width: 360px;
+            flex-shrink: 0;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
 
-.form-group {
-    margin-bottom: var(--gap-md);
-}
+        @media (max-width: 768px) {
+            .preview-box {
+                width: 100%;
+            }
+        }
 
-.form-row {
-    display: grid;
-    gap: var(--gap-md);
-    margin-bottom: var(--gap-md);
-}
+        .form-header, .preview-header {
+            background: #faf5ff;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-bottom: 1px solid #f0eaff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-.form-row-2 {
-    grid-template-columns: 1fr 1fr;
-}
+        .form-header { color: var(--primary); }
+        .preview-header { color: var(--secondary); justify-content: center; }
 
-.form-row-desc-foto {
-    grid-template-columns: 2fr 1fr;
-}
+        .form-body {
+            padding: 20px;
+            padding-bottom: 1px;
+            flex: 1;
+        }
 
-.form-row .form-group {
-    margin-bottom: 0;
-}
+        .alert {
+            background: #fff8f8;
+            color: #c0392b;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border-left: 3px solid var(--secondary);
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-.form-group label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 4px;
-    font-size: var(--fs-md);
-    color: var(--primary);
-}
-.required { color: var(--secondary); }
+        .form-group {
+            margin-bottom: 14px;
+        }
 
-input[type="text"],
-input[type="number"],
-input[type="file"],
-textarea {
-    width: 100%;
-    padding: 7px 10px;
-    border: 2px solid #e8e6f2;
-    border-radius: var(--radius);
-    font-size: var(--fs-md);
-    background: #fcfbff;
-    font-family: inherit;
-    transition: border-color 0.2s, background 0.2s;
-}
-input:focus,
-textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.1);
-}
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
 
-textarea {
-    min-height: 76px;
-    resize: vertical;
-}
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            color: var(--primary);
+        }
 
-.help {
-    display: block;
-    font-size: var(--fs-xs);
-    color: var(--text-muted);
-    margin-top: 3px;
-    font-style: italic;
-}
+        .required {
+            color: var(--secondary);
+        }
 
-.variant-input-group {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-.variant-input-group input {
-    flex: 1;
-    min-width: 140px;
-}
-.variant-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 4px;
-    min-height: 18px;
-}
-.variant-tag {
-    background: var(--soft);
-    color: var(--primary);
-    padding: 2px 7px;
-    border-radius: 14px;
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: var(--bg-light);
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
 
-.action-bar {
-    padding: 0.6rem 1rem;
-    background: #fbf9ff;
-    border-top: 1px solid var(--border);
-    display: flex;
-    gap: 8px;
-}
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.1);
+        }
 
-.preview-box {
-    width: 260px;
-    flex-shrink: 0;
-}
+        .form-row-meta {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
 
-.preview-header {
-    background: #f9f7ff;
-    color: var(--secondary);
-    padding: 0.5rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-}
+        @media (max-width: 600px) {
+            .form-row-meta {
+                flex-direction: column;
+            }
+        }
 
-.preview-body {
-    padding: var(--gap-sm);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--gap-xs);
-}
+        .form-row-meta .form-group {
+            flex: 1;
+            min-width: 0;
+        }
 
-.preview-img-container {
-    position: relative;
-}
-.preview-img-placeholder,
-.preview-img {
-    width: 140px;
-    height: 140px;
-    border-radius: var(--radius);
-    background: #fcfbff;
-}
-.preview-img-placeholder {
-    border: 1.5px dashed var(--soft);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    font-size: 1.4rem;
-}
-.preview-img {
-    object-fit: contain;
-    display: none;
-}
+        .help {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            display: block;
+        }
 
-.preview-text h3 {
-    color: var(--primary);
-    margin: 4px 0 2px;
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.3;
-}
+        .variant-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
 
-.preview-meta {
-    font-size: var(--fs-sm);
-    color: var(--primary);
-    margin-bottom: 2px;
-}
-.preview-meta span {
-    color: var(--secondary);
-    font-weight: 600;
-}
+        .variant-tag {
+            background: var(--soft);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
 
-.preview-text p {
-    font-size: var(--fs-xs);
-    color: #555;
-    margin-top: 0;
-    line-height: 1.4;
-    max-height: 40px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
+        .form-row-desc-foto {
+            display: flex;
+            gap: 16px;
+        }
 
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    padding: 6px 14px;
-    border-radius: var(--radius);
-    font-weight: 600;
-    font-size: var(--fs-md);
-    cursor: pointer;
-    text-decoration: none;
-    border: none;
-    transition: all 0.2s ease;
-    font-family: inherit;
-    min-height: var(--btn-h);
-    white-space: nowrap;
-}
-.btn-primary {
-    background: var(--secondary);
-    color: white;
-    flex: 1;
-}
-.btn-primary:hover {
-    background: #a34056;
-    transform: translateY(-1px);
-}
-.btn-secondary {
-    background: var(--soft);
-    color: var(--primary);
-    flex: 1;
-}
-.btn-secondary:hover {
-    background: #d5b4d9;
-}
+        @media (max-width: 768px) {
+            .form-row-desc-foto {
+                flex-direction: column;
+            }
+        }
 
-.alert {
-    background: #fff8f8;
-    color: #c0392b;
-    padding: 7px 12px;
-    border-radius: var(--radius);
-    margin-bottom: var(--gap-sm);
-    border-left: 3px solid var(--secondary);
-    font-size: var(--fs-xs);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 1px 5px rgba(182, 75, 98, 0.08);
-}
+        .form-row-desc-foto .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
 
-@media (max-width: 768px) {
-    body { padding: var(--gap-xs); }
-    .main-wrapper {
-        flex-direction: column;
-    }
-    .preview-box {
-        width: 100%;
-        max-width: 280px;
-        margin: 0 auto;
-    }
-    .preview-img-placeholder,
-    .preview-img {
-        width: 120px;
-        height: 120px;
-    }
-    .form-body,
-    .action-bar {
-        padding: var(--gap-xs);
-    }
-    .form-header {
-        padding: 0.5rem 0.8rem;
-        font-size: 0.95rem;
-    }
-}
+        textarea {
+            min-height: 150px;
+            resize: none;
+            padding: 14px 16px;
+        }
+
+        .upload-area {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px 16px;
+            border: 2px dashed var(--soft);
+            border-radius: 10px;
+            background: var(--bg-light);
+            cursor: pointer;
+            min-height: 150px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+        }
+
+        .upload-area i {
+            font-size: 1.8rem;
+            color: var(--text-muted);
+        }
+
+        .upload-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .upload-hint {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .upload-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .action-bar {
+            padding: 12px 20px;
+            background: #fbf9ff;
+            border-top: 1px solid #f3f0ff;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 768px) {
+            .action-bar {
+                flex-direction: column;
+            }
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary), #9e3e52);
+            color: white;
+            box-shadow: 0 3px 8px rgba(182, 75, 98, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(182, 75, 98, 0.25);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--soft), #c8a5d0);
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #d0a8d5, #c095cb);
+        }
+
+        .preview-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 16px;
+        }
+
+        .preview-img-container {
+            width: 100%;
+            max-width: 260px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-light);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #f0eaff;
+        }
+
+        .preview-img-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            padding: 10px;
+            text-align: center;
+        }
+
+        .preview-img-placeholder i {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+
+        .preview-img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .preview-text {
+            text-align: center;
+            max-width: 260px;
+        }
+
+        .preview-text h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary);
+            min-height: 1.4em;
+        }
+
+        .preview-meta {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .preview-meta span {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .preview-text p {
+            font-size: 0.92rem;
+            color: #666;
+            line-height: 1.5;
+            min-height: 60px;
+        }
     </style>
 </head>
 <body>
@@ -437,54 +491,52 @@ textarea {
                 <?php if ($msg): ?>
                     <div class="alert">
                         <i class="fas fa-exclamation-circle"></i>
-                        <?php echo htmlspecialchars($msg); ?>
+                        <?= htmlspecialchars($msg) ?>
                     </div>
                 <?php endif; ?>
 
                 <form id="addForm" method="POST" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="nama">Nama Produk <span class="required">*</span></label>
-                        <input 
-                            id="nama" 
-                            type="text" 
-                            name="nama" 
-                            value="<?php echo htmlspecialchars($namaVal); ?>" 
-                            placeholder="Contoh: Jus Buah"
-                            maxlength="100"
-                        >
-                    </div>
+                    <div class="form-row-meta">
+                        <div class="form-group">
+                            <label for="nama">Nama Produk <span class="required">*</span></label>
+                            <input 
+                                id="nama" 
+                                type="text" 
+                                name="nama" 
+                                value="<?= htmlspecialchars($namaVal) ?>" 
+                                placeholder="Contoh: Jus Mangga Segar"
+                                maxlength="100"
+                            >
+                        </div>
 
-                    <div class="form-row form-row-2">
                         <div class="form-group">
                             <label for="harga">Harga (Rp) <span class="required">*</span></label>
                             <input 
                                 id="harga" 
                                 type="number" 
                                 name="harga" 
-                                value="<?php echo htmlspecialchars($hargaVal); ?>" 
-                                placeholder="Contoh: 45000"
+                                value="<?= htmlspecialchars($hargaVal) ?>" 
+                                placeholder="45000"
                             >
                             <small class="help">Tanpa titik/koma</small>
                         </div>
 
                         <div class="form-group">
-                            <label for="varian">Varian (Opsional)</label>
-                            <div class="variant-input-group">
-                                <input 
-                                    id="varian" 
-                                    type="text" 
-                                    name="varian" 
-                                    value="<?php echo htmlspecialchars($varianVal); ?>"
-                                    placeholder="S,M,L"
-                                    maxlength="255"
-                                >
-                            </div>
+                            <label for="varian">Varian</label>
+                            <input 
+                                id="varian" 
+                                type="text" 
+                                name="varian" 
+                                value="<?= htmlspecialchars($varianVal) ?>"
+                                placeholder="S,M,L"
+                                maxlength="255"
+                            >
                             <small class="help">Pisahkan dengan koma</small>
                             <div class="variant-tags" id="variantPreview"></div>
                         </div>
                     </div>
 
-                    <div class="form-row form-row-desc-foto">
+                    <div class="form-row-desc-foto">
                         <div class="form-group">
                             <label for="deskripsi">Deskripsi</label>
                             <textarea 
@@ -492,18 +544,23 @@ textarea {
                                 name="deskripsi"
                                 placeholder="Ceritakan keunggulan produk..."
                                 maxlength="2000"
-                            ><?php echo htmlspecialchars($deskripsiVal); ?></textarea>
+                            ><?= htmlspecialchars($deskripsiVal) ?></textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="foto">Foto Produk</label>
-                            <input 
-                                id="foto" 
-                                type="file" 
-                                name="foto" 
-                                accept="image/jpeg,image/png,image/webp"
-                            >
-                            <small class="help">JPG/PNG/WEBP (≤3MB)</small>
+                            <div class="upload-area" id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <div class="upload-text" id="uploadFileName">Klik atau seret file</div>
+                                <div class="upload-hint">JPG, PNG, WebP • ≤3MB</div>
+                                <input 
+                                    id="foto" 
+                                    type="file" 
+                                    name="foto" 
+                                    accept="image/jpeg,image/png,image/webp"
+                                    class="upload-input"
+                                >
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -511,7 +568,7 @@ textarea {
 
             <div class="action-bar">
                 <a href="./admin/daftar_produk.php" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Batal
+                    <i class="fas fa-arrow-left"></i> Kembali
                 </a>
                 <button type="submit" form="addForm" class="btn btn-primary">
                     <i class="fas fa-save"></i> Simpan
@@ -525,10 +582,11 @@ textarea {
             </div>
             <div class="preview-body">
                 <div class="preview-img-container">
-                    <div class="preview-img-placeholder">
+                    <div class="preview-img-placeholder" id="previewPlaceholder">
                         <i class="fas fa-image"></i>
+                        <div>Belum ada foto</div>
                     </div>
-                    <img id="livePreviewImg" class="preview-img" src="" alt="Preview">
+                    <img id="livePreviewImg" class="preview-img" src="" alt="Preview Produk">
                 </div>
                 <div class="preview-text">
                     <h3 id="liveNama">Nama Produk</h3>
@@ -548,10 +606,14 @@ textarea {
             return 'Rp ' + n.toLocaleString('id-ID');
         }
 
-        const updateVarianText = (variants) => {
-            return variants.length ? variants.join(', ') : '';
+        const createVariantTags = (variants) => {
+            if (!variants?.length) return '';
+            return variants.map(v => 
+                `<span class="variant-tag"><i class="fas fa-tag"></i> ${v.trim()}</span>`
+            ).join('');
         };
 
+        // DOM
         const namaInput = document.getElementById('nama');
         const hargaInput = document.getElementById('harga');
         const varianInput = document.getElementById('varian');
@@ -562,54 +624,45 @@ textarea {
         const liveVarianDisplay = document.getElementById('liveVarianDisplay');
         const liveDeskripsi = document.getElementById('liveDeskripsi');
         const livePreviewImg = document.getElementById('livePreviewImg');
-        const placeholder = document.querySelector('.preview-img-placeholder');
+        const previewPlaceholder = document.getElementById('previewPlaceholder');
+        const uploadFileName = document.getElementById('uploadFileName');
         const variantPreview = document.getElementById('variantPreview');
 
+        // Init
         liveNama.textContent = namaInput.value || 'Nama Produk';
         liveHarga.textContent = formatRupiah(hargaInput.value);
         liveDeskripsi.textContent = deskripsiInput.value || 'Deskripsi produk akan muncul...';
+        const initVars = (varianInput.value || '').split(',').map(v => v.trim()).filter(v => v);
+        liveVarianDisplay.innerHTML = createVariantTags(initVars);
+        variantPreview.innerHTML = createVariantTags(initVars);
 
-        (() => {
-            const vars = varianInput.value.split(',').map(v => v.trim()).filter(v => v);
-            liveVarianDisplay.textContent = vars.length ? ' • ' + updateVarianText(vars) : '';
-            updateVariantPreview();
-        })();
-
-        namaInput.addEventListener('input', () => liveNama.textContent = namaInput.value || 'Nama Produk');
-        hargaInput.addEventListener('input', () => liveHarga.textContent = formatRupiah(hargaInput.value));
-        deskripsiInput.addEventListener('input', () => liveDeskripsi.textContent = deskripsiInput.value || 'Deskripsi produk akan muncul...');
-        varianInput.addEventListener('input', () => {
-            const vars = varianInput.value.split(',').map(v => v.trim()).filter(v => v);
-            liveVarianDisplay.textContent = vars.length ? ' • ' + updateVarianText(vars) : '';
-            updateVariantPreview();
+        // Live
+        namaInput.addEventListener('input', e => liveNama.textContent = e.target.value.trim() || 'Nama Produk');
+        hargaInput.addEventListener('input', e => liveHarga.textContent = formatRupiah(e.target.value));
+        deskripsiInput.addEventListener('input', e => liveDeskripsi.textContent = e.target.value.trim() || 'Deskripsi produk akan muncul...');
+        varianInput.addEventListener('input', e => {
+            const vars = e.target.value.split(',').map(v => v.trim()).filter(v => v);
+            liveVarianDisplay.innerHTML = createVariantTags(vars);
+            variantPreview.innerHTML = createVariantTags(vars);
         });
-
         fotoInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
+                const name = file.name.length > 22 ? file.name.substring(0, 19) + '...' : file.name;
+                uploadFileName.textContent = name;
                 const reader = new FileReader();
                 reader.onload = ev => {
                     livePreviewImg.src = ev.target.result;
                     livePreviewImg.style.display = 'block';
-                    placeholder.style.display = 'none';
+                    previewPlaceholder.style.display = 'none';
                 };
                 reader.readAsDataURL(file);
             } else {
+                uploadFileName.textContent = 'Klik atau seret file';
                 livePreviewImg.style.display = 'none';
-                placeholder.style.display = 'flex';
+                previewPlaceholder.style.display = 'flex';
             }
         });
-
-        function updateVariantPreview() {
-            const variants = varianInput.value
-                ? varianInput.value.split(',').map(v => v.trim()).filter(v => v)
-                : [];
-            variantPreview.innerHTML = variants.map(v =>
-                `<span class="variant-tag"><i class="fas fa-tag"></i> ${v}</span>`
-            ).join('');
-        }
-
-        updateVariantPreview();
     </script>
 </body>
 </html>

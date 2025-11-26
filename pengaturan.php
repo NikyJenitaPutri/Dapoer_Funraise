@@ -31,7 +31,7 @@ if (!isset($_SESSION['username'])) {
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Poppins', sans-serif;
-            background: var(--bg);
+            background: #f1e8fdff;
             color: var(--text);
             padding: 0rem;
             line-height: 1.5;

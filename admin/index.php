@@ -294,13 +294,6 @@ $tahun_ini = $tahun_pilihan;
                 <i class="mdi mdi-home menu-icon"></i>
               </a>
             </li>
-            <!-- 📊 MENU LAPORAN KEUANGAN BARU DENGAN ICON -->
-            <li class="nav-item">
-              <a class="nav-link" href="#" onclick="showSection('laporan'); return false;">
-                <span class="menu-title">Laporan Keuangan</span>
-                <i class="mdi mdi-chart-bar menu-icon"></i>
-              </a>
-            </li>
             <li class="nav-item">
               <a class="nav-link" href="#" onclick="showSection('produk'); return false;">
                 <span class="menu-title">Daftar Produk</span>
@@ -315,14 +308,19 @@ $tahun_ini = $tahun_pilihan;
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#" onclick="showSection('testimoni'); return false;">
-                <span class="menu-title">Lihat Testimoni</span>
+                <span class="menu-title">Testimoni</span>
                 <i class="mdi mdi-comment-text-outline menu-icon"></i>
               </a>
             </li>
-            
+            <li class="nav-item">
+              <a class="nav-link" href="#" onclick="showSection('laporan'); return false;">
+                <span class="menu-title">Laporan Keuangan</span>
+                <i class="mdi mdi-chart-bar menu-icon"></i>
+              </a>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="#" onclick="showSection('pengaturan'); return false;">
-                <span class="menu-title">PENGATURAN</span>
+                <span class="menu-title">Pengaturan</span>
                 <i class="mdi mdi-cog-outline menu-icon"></i>
               </a>
             </li>

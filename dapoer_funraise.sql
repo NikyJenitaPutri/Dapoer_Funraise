@@ -26,13 +26,15 @@ CREATE TABLE pesanan (
 );
 
 CREATE TABLE testimoni (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     nama VARCHAR(100) NOT NULL,
     nama_produk VARCHAR(100),
     komentar TEXT NOT NULL,
+    is_verified TINYINT(1) DEFAULT 0,
     dikirim_pada TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+drop table testimoni;
 CREATE TABLE header (
     id INT PRIMARY KEY AUTO_INCREMENT,
     logo_path VARCHAR(255) NOT NULL DEFAULT 'assets/logo.png',

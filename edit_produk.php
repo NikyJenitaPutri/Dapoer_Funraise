@@ -121,23 +121,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     box-sizing: border-box;
 }
 
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
-    background: #faf9ff;
+    background: #f1e8fdff;
     color: #333;
-    padding:0;
+    margin: 0;
+    padding: 0;
     font-size: var(--fs-md);
     line-height: 1.5;
+    min-height: 100vh;
 }
 
+/* ——— MAIN WRAPPER: FULL VIEWPORT WIDTH ——— */
 .main-wrapper {
     display: flex;
-    gap: var(--gap-md);
-    max-width: 1080px;
-    margin: 0 auto;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.form-box,
+html {
+    overflow-x: hidden;
+}
+
+.form-box {
+    flex: 1;
+    min-width: 0;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
 .preview-box {
     background: white;
     border-radius: var(--radius);
@@ -254,15 +277,16 @@ textarea {
     gap: 8px;
 }
 
+/* 🔷 PREVIEW BOX — LEBAR FIX, TAPI TIDAK MEMBATASI TOTAL */
 .preview-box {
-    width: 260px;
+    width: 280px;
     flex-shrink: 0;
 }
 
 .preview-header {
     background: #f9f7ff;
     color: var(--secondary);
-    padding: 0.5rem;
+    padding: 0.6rem;
     font-size: 0.95rem;
     font-weight: 600;
     text-align: center;
@@ -281,11 +305,12 @@ textarea {
 
 .preview-img-container {
     position: relative;
+    margin-bottom: 6px;
 }
 .preview-img-placeholder,
 .preview-img {
-    width: 250px;
-    height: 250px;
+    width: 240px;
+    height: 240px;
     border-radius: var(--radius);
     background: #fcfbff;
 }
@@ -381,21 +406,25 @@ textarea {
     box-shadow: 0 1px 5px rgba(182, 75, 98, 0.08);
 }
 
-@media (max-width: 768px) {
-    body { padding: var(--gap-xs); }
+/* 🔷 RESPONSIVE */
+@media (max-width: 900px) {
     .main-wrapper {
         flex-direction: column;
+        height: auto;
     }
     .preview-box {
         width: 100%;
-        max-width: 280px;
+        max-width: 320px;
         margin: 0 auto;
     }
     .preview-img-placeholder,
     .preview-img {
-        width: 120px;
-        height: 120px;
+        width: 200px;
+        height: 200px;
     }
+}
+@media (max-width: 768px) {
+    body { padding: var(--gap-xs); }
     .form-body,
     .action-bar {
         padding: var(--gap-xs);
@@ -409,6 +438,11 @@ textarea {
     }
     .form-row-desc-foto {
         grid-template-columns: 1fr;
+    }
+    .preview-img-placeholder,
+    .preview-img {
+        width: 160px;
+        height: 160px;
     }
 }
     </style>
@@ -497,7 +531,7 @@ textarea {
 
             <div class="action-bar">
                 <a href="./admin/daftar_produk.php" class="btn btn-secondary">
-                    <i class="fas fa-times"></i> Batal
+                    <i class="fas fa-arrow-left"></i> Kembali
                 </a>
                 <button type="submit" form="editForm" class="btn btn-primary">
                     <i class="fas fa-save"></i> Simpan Perubahan

@@ -129,10 +129,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             justify-content: center; 
         }
 
-        .form-body, .preview-body {
+        .form-body {
             padding: 1.5rem 1.4rem;
         }
 
+        /* Preview tanpa card dalam card */
+        .preview-body {
+            padding: 1.5rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* Preview elements */
+        .preview-step-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+
+        .preview-icon {
+            font-size: 2.2rem;
+            color: var(--primary);
+        }
+
+        .preview-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .preview-desc {
+            font-size: 0.92rem;
+            color: #555;
+            line-height: 1.5;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        /* Form styles — unchanged */
         .inline-group {
             display: flex;
             flex-wrap: wrap;
@@ -230,7 +277,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 0.85em;
         }
 
-        /* Alert */
         .alert {
             background: #fff8f8;
             color: #c0392b;
@@ -250,7 +296,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-left: 3px solid #66bb6a;
         }
 
-        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -290,7 +335,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: linear-gradient(135deg, #d0a8d5, #c095cb);
         }
 
-        /* Action bar */
         .action-bar {
             padding: 0.8rem 1.4rem 0.9rem;
             background: #fbf9ff;
@@ -304,54 +348,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .action-bar {
                 flex-direction: column;
             }
-        }
-
-        /* Preview Card — konsisten */
-        .preview-card {
-            background: #faf9ff;
-            border: 1px solid #f0eaff;
-            border-radius: 12px;
-            padding: 20px;
-            width: 100%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .preview-step-badge {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.4rem;
-            color: var(--primary);
-            margin-bottom: 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-        }
-
-        .preview-icon {
-            font-size: 2.2rem;
-            color: var(--primary);
-            margin-bottom: 16px;
-        }
-
-        .preview-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-
-        .preview-desc {
-            font-size: 0.92rem;
-            color: #555;
-            line-height: 1.5;
         }
     </style>
 </head>
@@ -380,6 +376,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
 
                 <form method="POST" id="stepForm">
+                    <!-- SATU BARIS: IKON + NO + JUDUL -->
                     <div class="inline-group">
                         <div class="inline-item">
                             <label for="icon_class">Kelas Ikon</label>
@@ -450,19 +447,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <!-- Preview Section -->
+        <!-- ✅ Preview tanpa card dalam card -->
         <div class="preview-box">
             <div class="preview-header">
                 <i class="fas fa-eye"></i> Preview Langkah
             </div>
             <div class="preview-body">
-                <div class="preview-card">
-                    <div class="preview-step-badge" id="previewStepBadge"><?= (int)$nextNum ?></div>
-                    <i class="fas fa-cookie-bite preview-icon" id="previewIcon"></i>
-                    <div class="preview-title" id="previewTitle">Pilih produk favorit</div>
-                    <div class="preview-desc" id="previewDesc">
-                        Pilih camilan kesukaanmu dari daftar menu yang tersedia.
-                    </div>
+                <!-- Langsung tampilkan elemen preview -->
+                <div class="preview-step-badge" id="previewStepBadge"><?= (int)$nextNum ?></div>
+                <i class="fas fa-cookie-bite preview-icon" id="previewIcon"></i>
+                <div class="preview-title" id="previewTitle">Pilih produk favorit</div>
+                <div class="preview-desc" id="previewDesc">
+                    Pilih camilan kesukaanmu dari daftar menu yang tersedia.
                 </div>
             </div>
         </div>

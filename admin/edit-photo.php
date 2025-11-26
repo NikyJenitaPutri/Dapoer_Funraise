@@ -377,21 +377,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 1.2rem;
         }
 
-        .preview-image-container {
-            width: 200px;
-            height: 200px;
-            border-radius: 12px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
-            overflow: hidden;
-        }
 
         .preview-image {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 200px;
+            max-height: 200px;
             object-fit: contain;
         }
 

@@ -21,8 +21,10 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
 
 // === ALERT ===
 $alert = '';
+$alertType = 'success';
 if (isset($_SESSION['kontak_alert'])) {
     $alert = $_SESSION['kontak_alert'];
+    $alertType = strpos($_SESSION['kontak_alert'], 'Gagal') !== false ? 'error' : 'success';
     unset($_SESSION['kontak_alert']);
 }
 ?>
@@ -32,338 +34,439 @@ if (isset($_SESSION['kontak_alert'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kontak — Admin</title>
+    <title>Kontak — Dapoer Funraise</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #B64B62;
-            --secondary: #5A46A2;
+            --primary: #5A46A2;
+            --secondary: #B64B62;
             --accent: #F9CC22;
-            --cream: #FFF5EE;
-            --dark: #2a1f3d;
-            --gray-btn: #6c757d;
-            --font-main: 'Poppins', sans-serif;
-            --transition: all 0.3s ease;
+            --soft: #DFBEE0;
+            --text-muted: #9180BB;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: var(--font-main);
-            background-color: #f9f7fc;
+            font-family: 'Poppins', sans-serif;
+            background: #f1e8fdff;
             color: #333;
-            padding: 20px;
+            font-size: 15px;
         }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(90, 70, 162, 0.1);
-            overflow: hidden;
-        }
-        header {
-            background: linear-gradient(90deg, var(--secondary), var(--primary));
-            color: white;
-            padding: 1rem 2rem;
+
+        .main-wrapper {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 0;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
         }
-        .header-title { font-size: 1.5rem; font-weight: 600; }
-        .header-title i { margin-right: 8px; }
-        .nav-actions a {
-            color: white;
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 500;
-            transition: var(--transition);
-            text-decoration: none;
+
+        @media (max-width: 768px) {
+            .main-wrapper {
+                flex-direction: column;
+            }
         }
-        .nav-actions a:hover { background: rgba(255,255,255,0.3); }
-        .content { padding: 30px; }
-        .section-heading {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
-        .alert {
-            padding: 14px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            text-align: left;
-        }
-        .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .alert-error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-        .form-row {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-        .form-col {
+
+        .form-box {
             flex: 1;
-            min-width: 300px;
+            background: white;
+            box-shadow: 0 5px 20px rgba(90, 70, 162, 0.1);
+            overflow: hidden;
+            border: 1px solid #f0eaff;
+            border-radius: 0;
         }
+
+        .cards-box {
+            width: 380px;
+            flex-shrink: 0;
+            background: white;
+            box-shadow: 0 5px 20px rgba(90, 70, 162, 0.1);
+            overflow: hidden;
+            border: 1px solid #f0eaff;
+            border-radius: 0;
+        }
+
+        @media (max-width: 768px) {
+            .cards-box {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        .form-header, .cards-header {
+            background: #faf5ff;
+            padding: 0.9rem 1.4rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-bottom: 1px solid #f0eaff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-header { color: var(--primary); }
+        .cards-header { color: var(--secondary); }
+
+        .form-body, .cards-body {
+            padding: 1.5rem 1.4rem;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        @media (min-width: 768px) {
+            .row {
+                flex-direction: row;
+                gap: 1.1rem;
+            }
+            .form-group {
+                flex: 1;
+            }
+        }
+
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 1rem;
         }
+
         .form-group label {
             display: block;
-            margin-bottom: 8px;
             font-weight: 600;
-            color: var(--dark);
-            font-size: 1.05rem;
-        }
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 2px solid #e0d6eb;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.2);
-        }
-        /* CARD LIST */
-        .cards-heading {
-            font-size: 1.5rem;
-            margin: 30px 0 16px;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .cards-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-        .card-item {
-            background: white;
-            border: 2px solid #e6e1f0;
-            border-radius: 14px;
-            padding: 20px;
-            position: relative;
-            transition: var(--transition);
-        }
-        .card-item:hover {
-            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-            transform: translateY(-4px);
-        }
-        .card-icon-preview {
-            width: 50px;
-            height: 50px;
-            background: var(--cream);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            font-size: 1.3rem;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
             color: var(--primary);
         }
-        .card-title { font-weight: 700; margin: 4px 0; color: var(--dark); }
-        .card-label { font-size: 0.95rem; color: #555; margin: 4px 0; }
-        .card-href { 
-            font-size: 0.85rem; 
-            color: #777; 
-            margin: 4px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+
+        input[type="text"] {
+            width: 100%;
+            padding: 11px 15px;
+            border: 2px solid #e8e6f2;
+            border-radius: 10px;
+            font-size: 0.93rem;
+            background: #faf9ff;
+            font-family: inherit;
+            transition: all 0.2s;
         }
-        .card-meta {
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.1);
+        }
+
+        .alert {
+            background: #fff8f8;
+            color: #c0392b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--secondary);
+            font-size: 0.9rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin: 12px 0 16px;
-            font-size: 0.85rem;
+            gap: 7px;
         }
-        .card-order { font-weight: 600; color: var(--primary); }
-        .card-status {
-            padding: 3px 8px;
-            border-radius: 16px;
-            font-weight: 600;
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 3px solid #66bb6a;
         }
-        .status-active { background: #d1fae5; color: #065f46; }
-        .status-inactive { background: #fee2e2; color: #b91c1c; }
-        .card-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+
         .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
-            padding: 8px 14px;
+            padding: 9px 18px;
             border-radius: 10px;
             font-weight: 600;
             font-size: 0.92rem;
             cursor: pointer;
-            transition: var(--transition);
-            border: none;
             text-decoration: none;
-            text-align: center;
+            border: none;
+            transition: all 0.15s;
+            font-family: inherit;
+            min-height: 40px;
         }
-        .btn-sm { padding: 6px 12px; font-size: 0.875rem; }
+
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #d05876);
+            background: linear-gradient(135deg, var(--secondary), #9e3e52);
             color: white;
+            flex: 1;
+            box-shadow: 0 2px 8px rgba(182, 75, 98, 0.2);
         }
+
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(182, 75, 98, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(182, 75, 98, 0.25);
         }
-        .btn-gray {
-            background: var(--gray-btn);
-            color: white;
+
+        .btn-secondary, .btn-gray {
+            background: linear-gradient(135deg, var(--soft), #c8a5d0);
+            color: var(--primary);
+            flex: 1;
         }
-        .btn-gray:hover { background: #5a6268; }
+
+        .btn-secondary:hover, .btn-gray:hover {
+            background: linear-gradient(135deg, #d0a8d5, #c095cb);
+        }
+
         .btn-outline {
             background: transparent;
-            border: 1px solid var(--primary);
             color: var(--primary);
+            border: 1px solid #e8e6f2;
         }
+
         .btn-outline:hover {
-            background: var(--primary);
-            color: white;
+            background: #faf9ff;
+            border-color: var(--primary);
         }
-        .btn-warning { background: #ffc107; color: #212529; }
-        .btn-warning:hover { background: #e0a800; }
-        .btn-success { background: #28a745; color: white; }
-        .btn-success:hover { background: #218838; }
-        .btn-danger { background: #dc3545; color: white; }
-        .btn-danger:hover { background: #c82333; }
+
+        .btn-danger {
+            background: #f9d9d9;
+            color: #d32f2f;
+            border: 1px solid #f1b7b7;
+        }
+
+        .btn-danger:hover {
+            background: #f5baba;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            min-height: auto;
+        }
+
+        .action-bar {
+            padding: 0.8rem 1.4rem 0.9rem;
+            background: #fbf9ff;
+            border-top: 1px solid #f3f0ff;
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .action-bar {
+                flex-direction: column;
+            }
+        }
+
+        .card-item {
+            background: #faf9ff;
+            border: 1px solid #f0eaff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--soft);
+            color: var(--primary);
+            border-radius: 50%;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .card-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.83rem;
+        }
+
+        .card-number { font-weight: 600; color: var(--primary); }
+        .card-status { font-weight: 500; }
+        .status-active { color: #2e7d32; }
+        .status-inactive { color: var(--text-muted); }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 3px;
+            font-size: 0.95rem;
+        }
+
+        .card-label,
+        .card-href {
+            font-size: 0.85rem;
+            color: #555;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .card-label { color: var(--text-muted); }
+        .card-href {
+            font-family: monospace;
+            background: #f9f7ff;
+            padding: 3px 6px;
+            border-radius: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
         .no-cards {
             text-align: center;
-            padding: 40px 20px;
-            color: #777;
-            background: var(--cream);
-            border-radius: 14px;
+            padding: 30px 10px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
-        .no-cards i { font-size: 2.5rem; margin-bottom: 16px; color: #ccc; }
-        @media (max-width: 768px) {
-            .form-row { flex-direction: column; }
-            .cards-list { grid-template-columns: 1fr; }
+
+        .no-cards i {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: #dcd6f7;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-title">
-                <i class="fas fa-address-book"></i> Kontak
+    <div class="main-wrapper">
+        <!-- Form Section -->
+        <div class="form-box">
+            <div class="form-header">
+                <i class="fas fa-heading" style="color: var(--secondary);"></i>
+                Judul & Subjudul
             </div>
-            <div class="nav-actions">
-                <a href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            </div>
-        </header>
 
-        <div class="content">
-            <h2 class="section-heading">Kelola Judul & Subjudul</h2>
+            <div class="form-body">
+                <?php if ($alert): ?>
+                    <div class="alert <?= $alertType === 'success' ? 'alert-success' : '' ?>">
+                        <i class="fas fa-<?= $alertType === 'success' ? 'check-circle' : 'exclamation-circle' ?>"></i>
+                        <?= htmlspecialchars($alert) ?>
+                    </div>
+                <?php endif; ?>
 
-            <?php if ($alert): ?>
-                <div class="alert <?= strpos($alert, 'Gagal') !== false ? 'alert-error' : 'alert-success' ?>">
-                    <?= htmlspecialchars($alert) ?>
-                </div>
-            <?php endif; ?>
-
-            <form action="update_kontak_section.php" method="POST">
-                <div class="form-row">
-                    <div class="form-col">
+                <form action="update_kontak_section.php" method="POST">
+                    <div class="row">
                         <div class="form-group">
                             <label for="title">Judul</label>
-                            <input type="text" id="title" name="title" class="form-control"
-                                   value="<?= htmlspecialchars($kontak_section['title']) ?>" required>
+                            <input 
+                                type="text" 
+                                id="title" 
+                                name="title"
+                                value="<?= htmlspecialchars($kontak_section['title']) ?>"
+                                required
+                                placeholder="Contoh: Hubungi Kami"
+                            >
                         </div>
-                    </div>
-                    <div class="form-col">
+
                         <div class="form-group">
                             <label for="subtitle">Subjudul</label>
-                            <input type="text" id="subtitle" name="subtitle" class="form-control"
-                                   value="<?= htmlspecialchars($kontak_section['subtitle']) ?>" required>
+                            <input 
+                                type="text" 
+                                id="subtitle" 
+                                name="subtitle"
+                                value="<?= htmlspecialchars($kontak_section['subtitle']) ?>"
+                                required
+                                placeholder="Contoh: Siap melayani..."
+                            >
                         </div>
                     </div>
-                </div>
-                <button type="submit" name="update_section" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Simpan Perubahan
-                </button>
-            </form>
 
-            <h3 class="cards-heading">
-                <i class="fas fa-id-card"></i> Daftar Kontak (<?= count($contact_cards) ?> item)
-            </h3>
+                    <button type="submit" name="update_section" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">
+                        <i class="fas fa-save"></i> Simpan Judul & Subjudul
+                    </button>
+                </form>
+            </div>
 
-            <?php if ($contact_cards): ?>
-                <div class="cards-list">
-                    <?php foreach ($contact_cards as $card): ?>
-                        <div class="card-item">
-                            <div class="card-icon-preview">
-                                <i class="fa <?= htmlspecialchars($card['icon_class']) ?>"></i>
-                            </div>
-                            <div class="card-title"><?= htmlspecialchars($card['title']) ?></div>
-                            <div class="card-label"><?= htmlspecialchars($card['label']) ?></div>
-                            <div class="card-href"><?= htmlspecialchars($card['href']) ?></div>
-                            <div class="card-meta">
-                                <span class="card-order">Urutan: <?= $card['sort_order'] ?></span>
-                                <span class="card-status <?= $card['is_active'] ? 'status-active' : 'status-inactive' ?>">
-                                    <?= $card['is_active'] ? 'Aktif' : 'Nonaktif' ?>
-                                </span>
-                            </div>
-                            <div class="card-actions">
-                                <a href="edit-contact-card.php?id=<?= $card['id'] ?>" class="btn btn-outline btn-sm">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <?php if ($card['is_active']): ?>
-                                    <form method="POST" action="toggle-contact-card.php" style="display:inline;"
-                                          onsubmit="return confirm('Nonaktifkan kontak ini? Tidak tampil di halaman utama.')">
-                                        <input type="hidden" name="id" value="<?= $card['id'] ?>">
-                                        <input type="hidden" name="action" value="deactivate">
-                                        <button type="submit" class="btn btn-warning btn-sm">
-                                            <i class="fas fa-eye-slash"></i> Nonaktifkan
-                                        </button>
-                                    </form>
-                                <?php else: ?>
-                                    <form method="POST" action="toggle-contact-card.php" style="display:inline;">
-                                        <input type="hidden" name="id" value="<?= $card['id'] ?>">
-                                        <input type="hidden" name="action" value="activate">
-                                        <button type="submit" class="btn btn-success btn-sm">
-                                            <i class="fas fa-eye"></i> Aktifkan
-                                        </button>
-                                    </form>
-                                <?php endif; ?>
-                                <form method="POST" action="delete-contact-card.php" style="display:inline;"
-                                      onsubmit="return confirm('Hapus kontak ini? Tindakan tidak bisa dibatalkan.')">
-                                    <input type="hidden" name="id" value="<?= $card['id'] ?>">
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fas fa-trash"></i> Hapus
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <div class="no-cards">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <p>Belum ada kontak. Tambahkan kontak pertama Anda.</p>
-                </div>
-            <?php endif; ?>
-
-            <div style="margin-top: 30px; text-align: center;">
+            <div class="action-bar">
+                <a href="../pengaturan.php" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
                 <a href="add-contact-card.php" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Tambah Kontak Baru
                 </a>
-                <a href="index.php" class="btn btn-gray">
-                    <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
-                </a>
+            </div>
+        </div>
+
+        <!-- Cards List Section -->
+        <div class="cards-box">
+            <div class="cards-header">
+                <i class="fas fa-id-card"></i>
+                Daftar Kontak (<?= count($contact_cards) ?> item)
+            </div>
+
+            <div class="cards-body">
+                <?php if ($contact_cards): ?>
+                    <?php foreach ($contact_cards as $i => $card): ?>
+                        <div class="card-item">
+                            <div class="card-icon">
+                                <i class="<?= htmlspecialchars($card['icon_class']) ?>"></i>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-meta">
+                                    <span class="card-number">Kontak #<?= $i + 1 ?></span>
+                                    <span class="card-status <?= $card['is_active'] ? 'status-active' : 'status-inactive' ?>">
+                                        <?= $card['is_active'] ? 'Aktif' : 'Nonaktif' ?>
+                                    </span>
+                                </div>
+                                <div class="card-title"><?= htmlspecialchars($card['title']) ?></div>
+                                <div class="card-label"><?= htmlspecialchars($card['label']) ?></div>
+                                <div class="card-actions">
+                                    <a href="edit-contact-card.php?id=<?= $card['id'] ?>" class="btn btn-outline btn-sm">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </a>
+                                    <?php if ($card['is_active']): ?>
+                                        <a href="toggle-contact-card.php?id=<?= $card['id'] ?>&action=deactivate"
+                                           class="btn btn-gray btn-sm"
+                                           onclick="return confirm('Nonaktifkan kontak ini? Tidak tampil di halaman utama.')">
+                                            <i class="fas fa-eye-slash"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="toggle-contact-card.php?id=<?= $card['id'] ?>&action=activate"
+                                           class="btn btn-gray btn-sm">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    <?php endif; ?>
+                                    <a href="delete-contact-card.php?id=<?= $card['id'] ?>"
+                                       class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Hapus kontak ini? Tindakan tidak bisa dibatalkan.')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="no-cards">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Belum ada kontak.</p>
+                        <a href="add-contact-card.php" class="btn btn-primary" style="margin-top:12px; width:100%;">
+                            <i class="fas fa-plus"></i> Tambah Kontak
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

@@ -153,7 +153,7 @@ function renderProduk($produkJson) {
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: var(--bg);
+            background:#f1e8fdff;
             color: var(--text);
             padding: 0rem;
             line-height: 1.4;

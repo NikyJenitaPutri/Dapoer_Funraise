@@ -122,15 +122,17 @@ $formatted_date = date('d M Y', strtotime($created_at));
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: #faf9ff;
+            background: #f1e8fdff;
             color: #333;
             font-size: var(--fs-md);
             line-height: 1.5;
             padding: 0;
+            margin:0;
+            min-height: 100vh;
         }
 
         .main-wrapper {
-            max-width: 1120px;
+            width: 100%;
             margin: 0 auto;
             padding: 0rem;
         }

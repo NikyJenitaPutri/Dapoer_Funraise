@@ -144,63 +144,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .form-header { color: var(--primary); }
         .preview-header { color: var(--secondary); justify-content: center; }
 
-        .form-body, .preview-body {
+        .form-body {
             padding: 1.5rem 1.4rem;
         }
 
-        .row {
+        /* ✅ Preview tanpa card dalam card — ikon diperbesar */
+        .preview-body {
+            padding: 1.5rem 1.2rem;
             display: flex;
             flex-direction: column;
-            gap: 1.1rem;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
         }
 
-        @media (min-width: 768px) {
-            .row {
-                flex-direction: row;
-                gap: 1.1rem;
-            }
-            .form-group {
-                flex: 1;
-            }
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 0.95rem;
-            color: var(--primary);
-        }
-
-        input[type="text"], input[type="number"], textarea {
+        .preview-icon-wrapper {
             width: 100%;
-            padding: 11px 15px;
-            border: 2px solid #e8e6f2;
-            border-radius: 10px;
-            font-size: 0.93rem;
-            background: #faf9ff;
-            font-family: inherit;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .preview-icon {
+            font-size: 3.6rem; /* ← Ikon diperbesar */
+            color: var(--primary);
             transition: all 0.2s;
         }
 
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.1);
+        .preview-icon.missing {
+            color: var(--text-muted);
+            font-size: 2.8rem;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 80px;
+        .preview-meta {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
         }
 
+        .preview-number {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .preview-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 10px;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .preview-desc {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.55;
+            text-align: center;
+            max-width: 90%;
+        }
+
+        /* Form styles — unchanged */
         .inline-group {
             display: flex;
             flex-wrap: wrap;
@@ -243,6 +251,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: var(--soft);
             color: var(--primary);
             font-size: 0.8rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            color: var(--primary);
+        }
+
+        input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 11px 15px;
+            border: 2px solid #e8e6f2;
+            border-radius: 10px;
+            font-size: 0.93rem;
+            background: #faf9ff;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .help-text {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        code {
+            background: #f0effc;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85em;
         }
 
         .alert {
@@ -317,63 +378,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 flex-direction: column;
             }
         }
-
-        .preview-card {
-            background: #faf9ff;
-            border: 1px solid #f0eaff;
-            border-radius: 12px;
-            padding: 20px;
-            width: 100%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .preview-icon-container {
-            width: 80px;
-            height: 80px;
-            border-radius: 16px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            margin-bottom: 16px;
-        }
-
-        .preview-icon {
-            font-size: 2.2rem;
-            color: var(--primary);
-        }
-
-        .preview-meta {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .preview-number {
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .preview-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-
-        .preview-desc {
-            font-size: 0.92rem;
-            color: #555;
-            line-height: 1.5;
-        }
     </style>
 </head>
 <body>
@@ -401,6 +405,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php endif; ?>
 
                 <form method="POST" id="editForm">
+                    <!-- SATU BARIS: IKON + NO + JUDUL -->
                     <div class="inline-group">
                         <div class="inline-item">
                             <label for="icon_class">Kelas Ikon</label>
@@ -417,6 +422,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <i class="fas <?= htmlspecialchars($step['icon_class']) ?>"></i>
                                 </span>
                             </div>
+                            <span class="help-text">
+                                Contoh: <code>fa-truck</code>, <code>fa-whatsapp</code>
+                            </span>
                         </div>
 
                         <div class="inline-item">
@@ -467,25 +475,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <!-- Preview Section -->
+        <!-- ✅ Preview — tanpa card dalam card, ikon besar -->
         <div class="preview-box">
             <div class="preview-header">
                 <i class="fas fa-eye"></i> Preview Langkah
             </div>
             <div class="preview-body">
-                <div class="preview-card">
-                    <div class="preview-icon-container">
-                        <i class="fas <?= htmlspecialchars($step['icon_class']) ?>" 
-                           id="previewIcon" 
-                           style="font-size: 2.2rem; color: var(--primary);"></i>
-                    </div>
-                    <div class="preview-meta">
-                        <span class="preview-number">Langkah <span id="previewNumber"><?= (int)$step['step_number'] ?></span></span>
-                        <span>• Preview</span>
-                    </div>
-                    <div class="preview-title" id="previewTitle"><?= htmlspecialchars($step['title']) ?></div>
-                    <div class="preview-desc" id="previewDesc"><?= htmlspecialchars($step['description']) ?></div>
+                <!-- Ikon besar di tengah -->
+                <div class="preview-icon-wrapper">
+                    <i class="fas <?= htmlspecialchars($step['icon_class']) ?>" 
+                       id="previewIcon" 
+                       class="preview-icon"></i>
                 </div>
+                <div class="preview-meta">
+                    <span class="preview-number">Langkah <span id="previewNumber"><?= (int)$step['step_number'] ?></span></span>
+                </div>
+                <div class="preview-title" id="previewTitle"><?= htmlspecialchars($step['title']) ?></div>
+                <div class="preview-desc" id="previewDesc"><?= htmlspecialchars($step['description']) ?></div>
             </div>
         </div>
     </div>
@@ -497,28 +503,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return div.innerHTML;
         }
 
-        document.getElementById('step_number').addEventListener('input', e => {
-            const num = e.target.value.trim() || '1';
-            document.getElementById('previewNumber').textContent = num;
-        });
-
+        // Live preview ikon (dengan validasi & fallback)
         document.getElementById('icon_class').addEventListener('input', e => {
             let val = e.target.value.trim();
-            if (!/^fa-[a-z0-9-]+$/i.test(val)) {
-                val = 'fa-cookie-bite';
+            const previewIcon = document.getElementById('previewIcon');
+            
+            if (val && /^fa-[a-z0-9-]+$/.test(val)) {
+                // Format valid: fa-whatsapp → fas fa-whatsapp
+                previewIcon.className = 'fas ' + val + ' preview-icon';
+                // Update inline preview
+                const inlineIcon = document.querySelector('.icon-preview i');
+                if (inlineIcon) inlineIcon.className = 'fas ' + val;
+                previewIcon.classList.remove('missing');
+            } else {
+                // Format tidak valid → tampilkan ikon fallback
+                previewIcon.className = 'fas fa-question-circle preview-icon missing';
             }
-            const fullClass = 'fas ' + val;
-            document.getElementById('previewIcon').className = fullClass;
-            const inlineIcon = document.querySelector('.icon-preview i');
-            if (inlineIcon) inlineIcon.className = fullClass;
+        });
+
+        // Live preview lainnya
+        document.getElementById('step_number').addEventListener('input', e => {
+            document.getElementById('previewNumber').textContent = e.target.value.trim() || '1';
         });
 
         document.getElementById('title').addEventListener('input', e => {
-            document.getElementById('previewTitle').textContent = e.target.value || 'Judul langkah';
+            document.getElementById('previewTitle').textContent = escapeHtml(e.target.value || 'Judul Langkah');
         });
 
         document.getElementById('description').addEventListener('input', e => {
-            document.getElementById('previewDesc').textContent = e.target.value || 'Deskripsi langkah';
+            document.getElementById('previewDesc').textContent = escapeHtml(e.target.value || 'Deskripsi langkah');
+        });
+
+        // Inisialisasi awal
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('icon_class').dispatchEvent(new Event('input'));
+            document.getElementById('step_number').dispatchEvent(new Event('input'));
+            document.getElementById('title').dispatchEvent(new Event('input'));
+            document.getElementById('description').dispatchEvent(new Event('input'));
         });
     </script>
 </body>
