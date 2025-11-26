@@ -684,6 +684,80 @@ $timeline_items = [
             box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.2);
         }
         .form-row textarea { resize: vertical; min-height: 130px; }
+        
+        /* Gaya baru untuk CAPTCHA */
+        .captcha-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px; /* Jarak antara label dan elemen captcha */
+        }
+        .captcha-input-wrapper {
+            position: relative;
+            flex-grow: 1; /* Biarkan input mengambil sisa ruang */
+            max-width: 250px; /* Batasi lebar input captcha */
+        }
+        .captcha-input-wrapper input {
+            padding-right: 50px !important; /* Ruang untuk tombol refresh */
+        }
+        .captcha-image-wrapper {
+            /* Gaya wrapper untuk gambar CAPTCHA */
+            border: 2px solid var(--purple-light);
+            background: var(--cream);
+            border-radius: 12px;
+            height: 52px; /* Dibuat lebih besar, sama dengan tinggi input + padding */
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Dipastikan ketengah */
+            transition: var(--transition);
+        }
+        .captcha-image-wrapper:hover {
+            border-color: var(--secondary);
+        }
+        .captcha-image-wrapper img {
+            /* **PERUBAHAN DISINI:** Menghilangkan width 120px statis yang mungkin menyebabkan pergeseran */
+            height: 100%;
+            width: 100%; /* Dibuat 100% dari lebar wrapper */
+            max-width: 120px; /* Batasi lebar maksimum */
+            object-fit: contain; /* Ganti dari cover ke contain agar kode captcha terlihat penuh */
+            cursor: pointer;
+            border: none;
+            border-radius: 0;
+            margin: 0 auto; /* Pastikan margin otomatis di semua sisi untuk centering */
+            vertical-align: top;
+        }
+        
+        .refresh-btn {
+            position: absolute;
+            right: 2px;
+            top: 2px;
+            width: 48px;
+            height: 48px;
+            border: none;
+            background: transparent;
+            color: var(--secondary);
+            font-size: 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .refresh-btn:hover {
+            background: rgba(90, 70, 162, 0.1);
+            transform: rotate(30deg);
+        }
+
+        /* Perbaikan: Ganti .form-group menjadi .form-row untuk konsistensi */
+        .form-row.captcha-container {
+            margin-bottom: 2rem;
+        }
+        .form-actions {
+            margin-top: 1.6rem;
+        }
+
 
         /* === TENTANG KAMI === */
         #tentang-kami {
@@ -1090,6 +1164,15 @@ $timeline_items = [
             .form-row input,
             .form-row textarea { padding: 12px 16px; font-size: 1rem; }
             .btn { padding: 14px 24px; font-size: 1rem; }
+            /* Penyesuaian layout CAPTCHA untuk mobile */
+            .captcha-group {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .captcha-input-wrapper {
+                max-width: 100%;
+            }
         }
         @media (max-width: 480px) {
             .section-title { font-size: 1.8rem; }
@@ -1198,7 +1281,7 @@ $timeline_items = [
     ['date' => 'AUG 2024', 'desc' => 'Ide Awal Fundraising', 'title' => 'Riset dan Perencanaan', 'long_desc' => 'Pada tahap ini, kami melakukan riset pasar dan membuat perencanaan awal untuk konsep penggalangan dana Expo Campus.'],
     
     // Contoh item lain:
-    ['date' => 'NOV 2024', 'desc' => 'Validasi Konsep Produk', 'title' => 'Pengembangan Konsep Awal', 'long_desc' => 'Kami mulai memvalidasi resep-resep cemilan andalan kami dan memastikan logistik untuk produksi massal.'],
+    ['date' => 'NOV 2024', 'desc' => 'Validasi Konsep Produk', 'title' => 'Pengembangan Konsep Awal', 'long_desc' => 'Kami mulai memvalidasi resep-resep cemilan antalan kami dan memastikan logistik untuk produksi massal.'],
     
     ['date' => 'FEB 2025', 'desc' => 'Pembentukan Tim Inti', 'title' => 'Tim dan Sumber Daya', 'long_desc' => 'Pembentukan tim inti yang solid, meliputi divisi produksi, pemasaran, dan keuangan.'],
     
@@ -1338,6 +1421,24 @@ $timeline_items = [
                         <div class="form-row">
                             <label for="komentar">Testimoni Anda</label>
                             <textarea id="komentar" name="komentar" rows="5" placeholder="Ceritakan pengalaman Anda..." required></textarea>
+                        </div>
+                        <div class="form-row captcha-container">
+                            <label for="captcha">Masukkan Kode CAPTCHA:</label>
+                            <div class="captcha-group">
+                                <div class="captcha-image-wrapper" onclick="document.getElementById('captcha_image').src = 'captcha.php?' + new Date().getTime();">
+                                    <img src="captcha.php" alt="CAPTCHA Image" id="captcha_image">
+                                </div>
+                                
+                                <div class="captcha-input-wrapper">
+                                    <input type="text" id="captcha" name="captcha" placeholder="Kode CAPTCHA" required>
+                                    
+                                    <button type="button" class="refresh-btn" 
+                                            onclick="document.getElementById('captcha_image').src = 'captcha.php?' + new Date().getTime();" 
+                                            title="Refresh CAPTCHA">
+                                        <i class="fa fa-refresh"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary">

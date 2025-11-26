@@ -8,15 +8,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nama = trim($_POST['nama'] ?? '');
     $nama_produk = trim($_POST['nama_produk'] ?? ''); // Field baru
     $komentar = trim($_POST['komentar'] ?? ''); // Ganti dari 'pesan'
+    
+    // --- START: Validasi CAPTCHA ---
+    $user_captcha = trim($_POST['captcha'] ?? ''); // Ambil input CAPTCHA dari pengguna
+    $stored_captcha = $_SESSION['captcha_code'] ?? ''; // Ambil kode dari session
 
-    // Validasi: pastikan nama dan komentar tidak kosong
+    // Penting: Hapus kode CAPTCHA dari session segera setelah diambil, baik berhasil atau gagal
+    unset($_SESSION['captcha_code']); 
+
+    // Cek apakah CAPTCHA benar (case-insensitive comparison)
+    if (empty($user_captcha) || strtolower($user_captcha) !== strtolower($stored_captcha)) {
+        $_SESSION['pesan_error'] = 'Kode CAPTCHA yang dimasukkan salah. Silakan coba lagi.';
+        header('Location: index.php#form-testimoni');
+        exit;
+    }
+    // --- END: Validasi CAPTCHA ---
+
+    // Validasi: pastikan nama dan komentar tidak kosong (Validasi yang sudah ada)
     if (empty($nama) || empty($komentar)) {
         $_SESSION['pesan_error'] = 'Nama dan Testimoni tidak boleh kosong.';
         header('Location: index.php#form-testimoni'); // Arahkan ke ID baru
         exit;
     }
 
-    // Jika validasi lolos, masukkan ke database
+    // Jika semua validasi lolos, masukkan ke database
     try {
         $stmt = $pdo->prepare("INSERT INTO testimoni (nama, nama_produk, komentar) VALUES (:nama, :nama_produk, :komentar)");
         $stmt->execute([
