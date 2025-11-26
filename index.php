@@ -13,30 +13,50 @@ if (!$header) {
     ];
 }
 
-// Ambil semua label dari DB
-$stmt = $pdo->query("SELECT label FROM navigation_links ORDER BY id ASC");
-$labels = $stmt->fetchAll(PDO::FETCH_COLUMN);
+// --- AMAN: Ambil data tentang_kami_section ---
+$stmtTentang = $pdo->prepare("SELECT title, subtitle, content FROM tentang_kami_section WHERE id = 1");
+$stmtTentang->execute();
+$tentang = $stmtTentang->fetch(PDO::FETCH_ASSOC);
 
-// Mapping label → href (pastikan konsisten dengan ID section di HTML)
-$hrefMap = [
-    'Beranda'       => '#beranda',
-    'Cara Pesan'    => '#cara-pesan',
-    'Tentang Kami'  => '#tentang-kami',
-    'Testimoni'     => '#testimoni-section',
-    'Kontak'        => '#kontak',
-];
+// Jika belum ada data, gunakan fallback (sesuai preferensi Anda)
+if (!$tentang) {
+    $tentang = [
+    'title'    => 'Tentang Kami',
+    'subtitle' => 'Dapur kecil, dampak besar untuk pendidikan',
+    'content'  => '
+        Dapoer Funraise adalah wujud kepedulian alumni MAN 2 Samarinda dalam mendukung 
+        <strong>Expo Campus MAN 2 Samarinda</strong> — acara tahunan untuk memperkenalkan perguruan tinggi kepada siswa.
+        Seluruh keuntungan penjualan cemilan digunakan untuk kebutuhan acara: konsumsi, dekorasi, dan logistik.
+        Kami percaya: bisnis kecil bisa berdampak besar!
+        '
+    ];
+}
 
-// Bangun array $navLinks agar kompatibel dengan template
-$navLinks = [];
-foreach ($labels as $label) {
-    $href = $hrefMap[trim($label)] ?? '#';
-    $navLinks[] = ['label' => $label, 'href' => $href];
+// --- AMAN: Ambil foto carousel aktif ---
+$stmtPhotos = $pdo->prepare("
+    SELECT image_path, alt_text 
+    FROM carousel_photos 
+    WHERE is_active = 1 
+    ORDER BY sort_order ASC, id ASC
+    ");
+$stmtPhotos->execute();
+$photos = $stmtPhotos->fetchAll(PDO::FETCH_ASSOC);
+
+// Fallback jika belum ada foto
+if (empty($photos)) {
+    $photos = [
+        ['image_path' => 'assets/kegiatan1.jpg', 'alt_text' => 'Tim Dapoer Funraise'],
+        ['image_path' => 'assets/kegiatan2.jpg', 'alt_text' => 'Kegiatan Expo Campus 2024'],
+        ['image_path' => 'assets/kegiatan3.jpg', 'alt_text' => 'Proses pembuatan cemilan'],
+        ['image_path' => 'assets/kegiatan4.jpg', 'alt_text' => 'Distribusi cemilan ke acara']
+    ];
 }
 
 // Testimoni tetap
 $stmtTesti = $pdo->query("
     SELECT id, nama, nama_produk, komentar, dikirim_pada 
     FROM testimoni 
+    WHERE is_verified = 1
     ORDER BY dikirim_pada DESC 
     LIMIT 3
 ");
@@ -63,29 +83,6 @@ $stmtSteps = $pdo->query("
 ");
 $cara_steps = $stmtSteps->fetchAll();
 
-
-// --- AMBIL DATA KONTAK SECTION (title & subtitle) ---
-$stmtKontakSec = $pdo->prepare("SELECT title, subtitle FROM kontak_section WHERE id = 1");
-$stmtKontakSec->execute();
-$kontak_section = $stmtKontakSec->fetch(PDO::FETCH_ASSOC);
-if (!$kontak_section) {
-    $kontak_section = [
-        'title'    => 'Hubungi Kami',
-        'subtitle' => 'Siap melayani pesanan Anda dengan senang hati'
-    ];
-}
-
-// --- AMBIL CARD KONTAK AKTIF, DIURUTKAN ---
-$stmtCards = $pdo->prepare("
-    SELECT icon_class, title, label, href 
-    FROM contact_cards 
-    WHERE is_active = 1 
-    ORDER BY sort_order ASC, id ASC
-");
-$stmtCards->execute();
-$contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
-
-
 // --- AMBIL DATA FOOTER (SESUAI PREFERENSI: TERPISAH, SINGLE ROW) ---
 $stmtFooter = $pdo->prepare("SELECT main_text, copyright_text FROM footer_section WHERE id = 1 AND is_active = 1");
 $stmtFooter->execute();
@@ -99,13 +96,27 @@ if (!$footerData) {
     ];
 }
 
-$timeline_items = [
-            ['date' => 'AUG 2024', 'desc' => 'Ide Awal Fundraising'],
-            ['date' => 'NOV 2024', 'desc' => 'Validasi Konsep Produk'],
-            ['date' => 'FEB 2025', 'desc' => 'Pembentukan Tim Inti'],
-            ['date' => 'MAR 2025', 'desc' => 'Dapoer Funraise Beroperasi'],
-            ['date' => 'MAY 2025', 'desc' => 'Laporan Keuntungan Final']
-        ];
+
+// --- AMBIL DATA KONTAK SECTION (title & subtitle) ---
+$stmtKontakSec = $pdo->prepare("SELECT title, subtitle FROM kontak_section WHERE id = 1");
+$stmtKontakSec->execute();
+$kontak_section = $stmtKontakSec->fetch(PDO::FETCH_ASSOC);
+    if (!$kontak_section) {
+        $kontak_section = [
+            'title'    => 'Hubungi Kami',
+            'subtitle' => 'Siap melayani pesanan Anda dengan senang hati'
+    ];
+    }
+
+// --- AMBIL CARD KONTAK AKTIF, DIURUTKAN ---
+$stmtCards = $pdo->prepare("
+    SELECT icon_class, title, label, href 
+    FROM contact_cards 
+    WHERE is_active = 1 
+    ORDER BY sort_order ASC, id ASC
+");
+$stmtCards->execute();
+$contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 
@@ -313,7 +324,7 @@ $timeline_items = [
 
         /* === SECTIONS === */
         section {
-            min-height: 85vh;
+            min-height: 100vh;
             padding: 100px 20px;
             display: flex;
             flex-direction: column;
@@ -322,7 +333,7 @@ $timeline_items = [
             scroll-snap-align: start;
         }
         .section-title {
-            font-size: 3rem;
+            font-size: 3.2rem;
             font-weight: 800;
             margin-bottom: 1.2rem;
             text-align: center;
@@ -505,7 +516,6 @@ $timeline_items = [
 
         /* === TESTIMONI & FORM COMBINED === */
         #testimoni-section {
-            
             background: linear-gradient(135deg, var(--purple-light), var(--cream));
             padding: 80px 20px;
         }
@@ -684,8 +694,119 @@ $timeline_items = [
             box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.2);
         }
         .form-row textarea { resize: vertical; min-height: 130px; }
-        
-        /* Gaya baru untuk CAPTCHA */
+
+        /* === TENTANG KAMI === */
+        #tentang-kami {
+            background: white;
+            padding: 60px 20px;
+        }
+        #tentang-kami .section-title {
+            margin-bottom: 1.5rem;
+        }
+        #tentang-kami .section-subtitle {
+            margin-bottom: 2rem;
+            color: var(--dark);
+        }
+        .about-content-wrapper {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: center;
+        }
+        .about-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+        }
+        .about-content p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            color: #444;
+            margin-bottom: 1.5rem;
+        }
+
+        /* === PHOTO CAROUSEL === */
+        .photo-carousel {
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: 0 12px 30px rgba(90, 70, 162, 0.2);
+            background: white;
+        }
+        .carousel-wrapper {
+            display: flex;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+        }
+        .carousel-slide {
+            min-width: 100%;
+            scroll-snap-align: start;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+        .photo-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        .photo-item {
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        .photo-item:hover {
+            transform: scale(1.02);
+        }
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            transform: translateY(-50%);
+            z-index: 10;
+        }
+        .carousel-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.85);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: var(--secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(90, 70, 162, 0.3);
+        }
+        .carousel-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+        .carousel-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .captcha-group {
             display: flex;
             align-items: center;
@@ -756,287 +877,6 @@ $timeline_items = [
         }
         .form-actions {
             margin-top: 1.6rem;
-        }
-
-
-        /* === TENTANG KAMI === */
-        #tentang-kami {
-            background: white;
-            padding: 40px 20px;
-        }
-        /* NEW: Timeline Section - Ringkas & SATU BARIS */
-        /* Hapus semua style box yang tidak diperlukan */
-        /* Kontainer Utama Timeline */
-       /* Kontainer Utama Timeline */
-        
-      /* --- KODE CSS LENGKAP UNTUK TIMELINE --- */
-        
-        /* Kontainer Utama Timeline */
-        .timeline-container {
-            display: flex; 
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            gap: 1px;
-            padding-top: 7px; 
-            padding-bottom: 10px;
-            overflow-x: hidden;
-            background: transparent;
-            border: none;
-            position: relative; 
-            z-index: 1;
-            margin-bottom: 20px; 
-            /* Tambahkan padding kanan-kiri untuk ruang panah */
-            padding-left: 10px; 
-            padding-right: 10px;
-        }
-        
-        /* Garis Penghubung Horizontal (Menggunakan ::before pada kontainer) */
-        .timeline-container::before {
-            content: '';
-            position: absolute;
-            top: 40px; /* Posisi vertikal garis */
-            left: 10px; /* Dimulai setelah panah kiri */
-            right: 10px; /* Berakhir sebelum panah kanan */
-            height: 2px;
-            background: #e0e0e0;
-            z-index: -1;
-        }
-
-        /* Panah KANAN (Menggunakan ::after pada kontainer) */
-        .timeline-container::after {
-            content: '';
-            position: absolute;
-            top: 33px; /* 40px - 4px (agar panah di tengah garis) */
-            right: 10px; 
-            width: 0;
-            height: 0;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-left: 8px solid #e0e0e0; /* Panah menunjuk ke KIRI */
-            z-index: 0; 
-        }
-        
-        /* Panah KIRI (Menggunakan ::before pada elemen dot PERTAMA, tambahkan ini di bawah) */
-        .timeline-dot-item:first-child::before {
-            content: '';
-            position: absolute;
-            top: 33px; 
-            left: 10px; 
-            width: 0;
-            height: 0;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-right: 8px solid #e0e0e0; /* Panah menunjuk ke KANAN */
-            z-index: 0;
-            transform: translateX(-100%); /* Dorong panah agar tepat di luar padding kiri kontainer */
-        }
-        
-        /* Koreksi margin dot agar tepat di tengah */
-        .timeline-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            margin: 30px auto 5px; /* Margin atas 30px agar dot berada di posisi 40px */
-            box-shadow: 0 0 0 4px rgba(182, 75, 98, 0.1);
-            transition: all 0.3s ease;
-        }
-        .timeline-dot-item.dot-active .timeline-dot {
-            background: var(--secondary);
-            box-shadow: 0 0 0 6px rgba(90, 70, 162, 0.3);
-            transform: scale(1.2);
-        }
-        .timeline-date {
-            display: block;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 3px;
-            font-size: 0.75rem;
-            text-align: center;
-        }
-        .timeline-dot-item p {
-            font-size: 0.85rem;
-            line-height: 1.3;
-            color: #555;
-            margin: 0;
-            /* Memotong teks agar tidak terlalu panjang, jika diperlukan */
-            text-align: center;
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            white-space: normal;
-        }
-
-        /* KOREKSI: Wrapper Detail Box */
-        .timeline-detail-box-wrapper {
-            width: 100%;
-            /* Ganti height: auto; menjadi max-height: 0 dan overflow: hidden; */
-            max-height: 0; 
-            overflow: hidden; 
-            
-            margin-bottom: 0px; /* Set margin ke 0 saat tertutup */
-            position: relative;
-            
-            /* Tambahkan transisi untuk animasi tinggi */
-            transition: max-height 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), margin-bottom 0.4s;
-        }
-
-        /* NEW: Saat ada kotak detail yang aktif, wrapper menyesuaikan tinggi */
-        .timeline-detail-box-wrapper.active {
-             /* Nilai yang cukup besar untuk menampung konten kotak detail */
-            max-height: 500px; 
-            margin-bottom: 20px; /* Kembalikan margin agar ada jarak ke kotak teks di bawah */
-        }
-
-        .timeline-dot-item.clickable {
-            cursor: pointer; /* Menunjukkan bahwa item dapat diklik */
-        }
-
-        .timeline-detail-box {
-            /* Gaya Box */
-            background: var(--cream);
-            border: 2px solid var(--primary);
-            border-radius: 12px;
-            padding: 15px;
-            
-            /* HAPUS position: absolute; agar memakan ruang */
-            position: static; 
-            width: 100%; /* Mengisi lebar penuh */
-            
-            /* Animasi untuk transisi yang halus */
-            transition: opacity 0.3s ease-in-out;
-            z-index: 10;
-            margin-top: 15px; /* Tambahkan jarak ke timeline dot */
-        }
-
-        .timeline-detail-box.hidden {
-            display: none; /* Menyembunyikan secara default */
-            opacity: 0;
-        }
-        
-        /* NEW: Saat detail box aktif (bersamaan dengan wrapper aktif) */
-        .timeline-detail-box.active {
-            opacity: 1;
-            display: block; /* Pastikan display block agar terlihat */
-        }
-
-        .timeline-detail-box h4 {
-            color: var(--secondary);
-            font-size: 1.2rem;
-            margin-top: 0;
-            margin-bottom: 8px;
-        }
-        .timeline-detail-box p {
-            font-size: 1rem;
-            line-height: 1.5;
-            color: #555;
-            margin-bottom: 0;
-        }
-        
-        #tentang-kami .section-title {
-            margin-bottom: 1.5rem;
-        }
-        #tentang-kami .section-subtitle {
-            margin-bottom: 2rem;
-            color: var(--dark);
-        }
-        .about-content-wrapper {
-            max-width: 1200px;
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            align-items: flex-start;
-        }
-        .about-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: var(--shadow-md);
-        }
-        .about-content p {
-            font-size: 1rem;
-            line-height: 1.8;
-            color: #444;
-            margin-bottom: 0.5rem;
-        }
-
-        /* === PHOTO CAROUSEL === */
-        .photo-carousel {
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            border-radius: 16px;
-            box-shadow: 0 12px 30px rgba(90, 70, 162, 0.2);
-            background: white;
-        }
-        .carousel-wrapper {
-            display: flex;
-            scroll-behavior: smooth;
-            scroll-snap-type: x mandatory;
-        }
-        .carousel-slide {
-            min-width: 100%;
-            scroll-snap-align: start;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px 0;
-        }
-        .photo-grid {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-        .photo-item {
-            width: 100%;
-            max-width: 500px;
-            aspect-ratio: 16 / 10.8;
-            overflow: hidden;
-            border-radius: 12px;
-        }
-        .photo-item:hover {
-            transform: scale(1.02);
-        }
-        .photo-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .carousel-nav {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 20px;
-            transform: translateY(-50%);
-            z-index: 10;
-        }
-        .carousel-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.85);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            color: var(--secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 4px 12px rgba(90, 70, 162, 0.3);
-        }
-        .carousel-btn:hover {
-            background: white;
-            transform: scale(1.1);
-        }
-        .carousel-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            transform: none;
         }
 
         /* === FOOTER === */
@@ -1164,15 +1004,6 @@ $timeline_items = [
             .form-row input,
             .form-row textarea { padding: 12px 16px; font-size: 1rem; }
             .btn { padding: 14px 24px; font-size: 1rem; }
-            /* Penyesuaian layout CAPTCHA untuk mobile */
-            .captcha-group {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
-            .captcha-input-wrapper {
-                max-width: 100%;
-            }
         }
         @media (max-width: 480px) {
             .section-title { font-size: 1.8rem; }
@@ -1201,9 +1032,11 @@ $timeline_items = [
         </div>
 
         <ul class="nav-links">
-            <?php foreach ($navLinks as $link): ?>
-                <li><a href="<?= htmlspecialchars($link['href']) ?>"><?= htmlspecialchars($link['label']) ?></a></li>
-            <?php endforeach; ?>
+            <li><a href="#beranda">Beranda</a></li>
+            <li><a href="#cara-pesan"><?= htmlspecialchars($cara_title) ?></a></li>
+            <li><a href="#tentang-kami"><?= htmlspecialchars($tentang['title']) ?></a></li>
+            <li><a href="#testimoni-section">Testimoni</a></li>
+            <li><a href="#kontak"><?= htmlspecialchars($kontak_section['title']) ?></a></li>
         </ul>
     </header>
 
@@ -1230,106 +1063,14 @@ $timeline_items = [
             </div>
         </section>
 
-        <?php
-        // --- AMAN: Ambil data tentang_kami_section ---
-        $stmtTentang = $pdo->prepare("SELECT title, subtitle, content FROM tentang_kami_section WHERE id = 1");
-        $stmtTentang->execute();
-        $tentang = $stmtTentang->fetch(PDO::FETCH_ASSOC);
-
-        // Jika belum ada data, gunakan fallback (sesuai preferensi Anda)
-        if (!$tentang) {
-            $tentang = [
-                'title'    => 'Tentang Kami',
-                'subtitle' => 'Dapur kecil, dampak besar untuk pendidikan',
-                'content'  => '
-                    Dapoer Funraise adalah wujud kepedulian alumni MAN 2 Samarinda dalam mendukung 
-                    <strong>Expo Campus MAN 2 Samarinda</strong> — acara tahunan untuk memperkenalkan perguruan tinggi kepada siswa.
-                    Seluruh keuntungan penjualan cemilan digunakan untuk kebutuhan acara. konsumsi, dekorasi, dan logistik.
-                    Kami percaya: bisnis kecil bisa berdampak besar!
-                    
-                '
-            ];
-        }
-
-        // --- AMAN: Ambil foto carousel aktif ---
-        $stmtPhotos = $pdo->prepare("
-            SELECT image_path, alt_text 
-            FROM carousel_photos 
-            WHERE is_active = 1 
-            ORDER BY sort_order ASC, id ASC
-        ");
-        $stmtPhotos->execute();
-        $photos = $stmtPhotos->fetchAll(PDO::FETCH_ASSOC);
-
-        // Fallback jika belum ada foto
-        if (empty($photos)) {
-            $photos = [
-                ['image_path' => 'assets/kegiatan1.jpg', 'alt_text' => 'Tim Dapoer Funraise'],
-                ['image_path' => 'assets/kegiatan2.jpg', 'alt_text' => 'Kegiatan Expo Campus 2024'],
-                ['image_path' => 'assets/kegiatan3.jpg', 'alt_text' => 'Proses pembuatan cemilan'],
-                ['image_path' => 'assets/kegiatan4.jpg', 'alt_text' => 'Distribusi cemilan ke acara']
-            ];
-        }
-        ?>
-
-       <?php
-        // ... (Data $tentang, $photos)
-        
-        // --- TAMBAHAN: Data Timeline Sementara (PERLU DIPINDAH KE ATAS) ---
-       $timeline_items = [
-    // Tambahkan 'title' dan 'long_desc'
-    ['date' => 'AUG 2024', 'desc' => 'Ide Awal Fundraising', 'title' => 'Riset dan Perencanaan', 'long_desc' => 'Pada tahap ini, kami melakukan riset pasar dan membuat perencanaan awal untuk konsep penggalangan dana Expo Campus.'],
-    
-    // Contoh item lain:
-    ['date' => 'NOV 2024', 'desc' => 'Validasi Konsep Produk', 'title' => 'Pengembangan Konsep Awal', 'long_desc' => 'Kami mulai memvalidasi resep-resep cemilan antalan kami dan memastikan logistik untuk produksi massal.'],
-    
-    ['date' => 'FEB 2025', 'desc' => 'Pembentukan Tim Inti', 'title' => 'Tim dan Sumber Daya', 'long_desc' => 'Pembentukan tim inti yang solid, meliputi divisi produksi, pemasaran, dan keuangan.'],
-    
-    ['date' => 'MAR 2025', 'desc' => 'Dapoer Funraise Beroperasi', 'title' => 'Peluncuran Resmi', 'long_desc' => 'Dapoer Funraise resmi beroperasi, menerima pesanan untuk pertama kalinya.'],
-    
-    ['date' => 'MAY 2025', 'desc' => 'Laporan Keuntungan', 'title' => 'Laporan dan Donasi', 'long_desc' => 'Kami menyusun laporan keuangan dan menyerahkan donasi guna mendukung acara expo campus MAN 2 untuk pertama kalinya dan terus kami lakukan hingga sekarang.'],
-];
-        // --- AKHIR Data Timeline Sementara ---
-        ?>
-
         <section id="tentang-kami" class="fade-in">
             <h2 class="section-title"><?= htmlspecialchars($tentang['title']) ?></h2>
             <p class="section-subtitle"><?= htmlspecialchars($tentang['subtitle']) ?></p>
             <div class="about-content-wrapper">
-                
-                <div class="about-left-column">
-                    
-                    <div class="timeline-container">
-                        <?php 
-                        $i = 0; // Tambahkan counter untuk ID
-                        foreach ($timeline_items as $item): ?>
-                            <div class="timeline-dot-item clickable" data-timeline-id="item-<?= $i ?>">
-                                <div class="timeline-dot"></div>
-                                <span class="timeline-date"><?= htmlspecialchars($item['date']) ?></span>
-                                <p><?= htmlspecialchars($item['desc']) ?></p>
-                            </div>
-                        <?php 
-                        $i++;
-                        endforeach; ?>
-                    </div>
-
-                    <div class="timeline-detail-box-wrapper">
-    <?php 
-    $j = 0; // Index untuk ID unik
-    foreach ($timeline_items as $item): ?>
-        <div class="timeline-detail-box hidden" id="detail-item-<?= $j ?>">
-            <h4><?= htmlspecialchars($item['title']) ?></h4>
-            <p><?= htmlspecialchars($item['long_desc']) ?></p> </div>
-    <?php 
-    $j++;
-    endforeach; ?>
-</div>
-                    
-                    <div class="about-content">
-                        <p>
-                            <?= $tentang['content'] ?>
-                        </p>
-                    </div>
+                <div class="about-content">
+                    <p>
+                        <?= $tentang['content'] ?>
+                    </p>
                 </div>
                 <div class="photo-carousel">
                     <div class="carousel-wrapper" id="carouselWrapper">
@@ -1353,8 +1094,9 @@ $timeline_items = [
                         </button>
                     </div>
                 </div>
-                </div>
+            </div>
         </section>
+
         <section id="testimoni-section" class="fade-in">
             <h2 class="section-title">Testimoni & Kirim Pesan</h2>
             <p class="section-subtitle">Dengar dari pelanggan kami dan bagikan pengalaman Anda!</p>
@@ -1449,30 +1191,6 @@ $timeline_items = [
                 </div>
             </div>
         </section>
-
-        <?php
-        // --- AMBIL DATA KONTAK SECTION (title & subtitle) ---
-        $stmtKontakSec = $pdo->prepare("SELECT title, subtitle FROM kontak_section WHERE id = 1");
-        $stmtKontakSec->execute();
-        $kontak_section = $stmtKontakSec->fetch(PDO::FETCH_ASSOC);
-        if (!$kontak_section) {
-            $kontak_section = [
-                'title'    => 'Hubungi Kami',
-                'subtitle' => 'Siap melayani pesanan Anda dengan senang hati'
-            ];
-        }
-
-        // --- AMBIL CARD KONTAK AKTIF, DIURUTKAN ---
-        $stmtCards = $pdo->prepare("
-            SELECT icon_class, title, label, href 
-            FROM contact_cards 
-            WHERE is_active = 1 
-            ORDER BY sort_order ASC, id ASC
-        ");
-        $stmtCards->execute();
-        $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
-        ?>
-
         <section id="kontak" class="fade-in">
             <h2 class="section-title"><?= htmlspecialchars($kontak_section['title']) ?></h2>
             <p class="section-subtitle"><?= htmlspecialchars($kontak_section['subtitle']) ?></p>
@@ -1643,8 +1361,6 @@ $timeline_items = [
             btnBackToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
         }
 
-        
-
         // ▼▼▼ 9. ACCORDION TESTIMONI (3 item, rapi & interaktif) ▼▼▼
         document.querySelectorAll('.testimoni-accordion').forEach(acc => {
             const header = acc.querySelector('.accordion-header');
@@ -1663,43 +1379,6 @@ $timeline_items = [
                 if (!isActive) {
                     acc.classList.add('active');
                     body.style.maxHeight = body.scrollHeight + 'px';
-                }
-            });
-        });
-
-
-        // ▼▼▼ 10. TIMELINE INTERAKTIF (DOT KE BOX) - KOREKSI FINAL: MENGHILANGKAN JARAK BESAR ▼▼▼
-        const timelineItems = document.querySelectorAll('.timeline-dot-item.clickable');
-        const wrapper = document.querySelector('.timeline-detail-box-wrapper');
-        
-        timelineItems.forEach((item) => {
-            item.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-timeline-id');
-                const targetBox = document.getElementById(`detail-${targetId}`);
-
-                if (!targetBox || !wrapper) return;
-
-                const isActive = targetBox.classList.contains('active');
-                
-                // 1. Tutup/Reset semua (Kotak Detail & Wrapper)
-                document.querySelectorAll('.timeline-detail-box').forEach(box => {
-                    box.classList.remove('active');
-                    box.classList.add('hidden');
-                });
-                wrapper.classList.remove('active'); 
-                
-                // 2. Hapus status aktif dari semua dot
-                timelineItems.forEach(dot => dot.classList.remove('dot-active'));
-                
-                if (!isActive) {
-                    // 3. Buka yang diklik
-                    targetBox.classList.remove('hidden');
-                    // Tambahkan timeout untuk transisi opacity (opsional)
-                    setTimeout(() => targetBox.classList.add('active'), 10); 
-                    
-                    // 4. Tandai dot sebagai aktif dan buka wrapper
-                    this.classList.add('dot-active');
-                    wrapper.classList.add('active'); 
                 }
             });
         });

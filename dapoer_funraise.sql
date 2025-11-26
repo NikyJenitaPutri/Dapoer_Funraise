@@ -76,9 +76,10 @@ CREATE TABLE cara_pesan_steps (
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
     sort_order INT DEFAULT 0,
-    is_active BOOLEAN DEFAULT 1
+    is_active BOOLEAN DEFAULT 1,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
-
 CREATE TABLE tentang_kami_section (
     id INT PRIMARY KEY AUTO_INCREMENT,
     title VARCHAR(150) NOT NULL DEFAULT 'Tentang Kami',
