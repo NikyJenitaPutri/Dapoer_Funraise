@@ -41,173 +41,287 @@ $current = $stmt->fetch(PDO::FETCH_ASSOC) ?: [
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Footer — Admin Dapoer Funraise</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #B64B62;
-            --secondary: #5A46A2;
-            --cream: #FFF5EE;
-            --dark: #2a1f3d;
+            --primary: #5A46A2;
+            --secondary: #B64B62;
+            --accent: #F9CC22;
+            --bg-light: #FFF5EE;
+            --soft: #DFBEE0;
+            --text-muted: #9180BB;
+            --card-shadow: 0 5px 20px rgba(90, 70, 162, 0.1);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f9f7fc;
-            color: var(--dark);
+            background: #f1e8fdff;
+            color: #333;
+            font-size: 15px;
             padding: 20px;
         }
-        .container { max-width: 800px; margin: 0 auto; }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+
         .card {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(90, 70, 162, 0.1);
-            padding: 32px;
-            margin-bottom: 24px;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            border: 1px solid #f0eaff;
         }
-        .card-title {
-            font-size: 1.6rem;
+
+        .card-header {
+            background: linear-gradient(120deg, #f5f3ff, #faf5ff);
+            padding: 1.2rem 1.5rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            margin-bottom: 24px;
-            color: var(--secondary);
+            border-bottom: 1px solid #f0eaff;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            color: var(--primary);
         }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 0.8rem;
         }
+
         .form-group label {
             display: block;
             font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            color: var(--primary);
         }
+
         .form-control {
             width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e0d6eb;
-            border-radius: 12px;
-            font-size: 1.05rem;
-            background-color: var(--cream);
-            transition: border-color 0.3s;
+            padding: 11px 15px;
+            border: 2px solid #e8e6f2;
+            border-radius: 10px;
+            font-size: 0.93rem;
+            background: #faf9ff;
+            font-family: inherit;
+            transition: all 0.2s;
         }
+
         .form-control:focus {
             outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.2);
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.1);
         }
+
+        .alert {
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 3px solid #4caf50;
+        }
+
+        .alert-error {
+            background: #fff8f8;
+            color: #c0392b;
+            border-left: 3px solid var(--secondary);
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 14px 32px;
-            border: none;
-            border-radius: 14px;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 0.92rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            transition: all 0.15s;
+            font-family: inherit;
+            min-height: 40px;
         }
+
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #d05876);
+            background: linear-gradient(135deg, var(--secondary), #9e3e52);
             color: white;
+            flex: 1;
+            box-shadow: 0 2px 8px rgba(182, 75, 98, 0.2);
         }
+
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(182, 75, 98, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(182, 75, 98, 0.25);
         }
-        .alert {
-            padding: 16px 20px;
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--soft), #c8a5d0);
+            color: var(--primary);
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #d0a8d5, #c095cb);
+        }
+
+        /* Footer preview styling — sesuai brand */
+        .footer-preview {
+            background: var(--primary);
+            color: white;
+            padding: 24px 20px;
             border-radius: 12px;
-            margin-bottom: 20px;
-            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.5;
             text-align: center;
         }
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
+
+        .footer-preview .copyright {
+            font-weight: 600;
+            margin-bottom: 6px;
         }
-        .alert-error {
-            background: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
+
+        .footer-preview .main-text {
+            opacity: 0.9;
+            font-size: 0.88rem;
         }
-        .btn-back {
-            background: #e0e0e0;
-            color: var(--dark);
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-        .btn-back:hover {
-            background: #d0d0d0;
+
+        @media (max-width: 576px) {
+            .actions {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <h1 class="card-title">
-                <i class="fas fa-edit"></i> Edit Footer Website
-            </h1>
+        <!-- Form Card -->
+        <div class="card" style="flex: 1;">
+            <div class="card-header">
+                <i class="fas fa-edit" style="color: var(--secondary);"></i>
+                Edit
+            </div>
+            <div class="card-body">
+                <?php if ($message): ?>
+                    <div class="alert alert-<?= $message['type'] ?>">
+                        <i class="fas fa-<?= $message['type'] === 'success' ? 'check-circle' : 'exclamation-triangle' ?>"></i>
+                        <?= htmlspecialchars($message['text']) ?>
+                    </div>
+                <?php endif; ?>
 
-            <?php if ($message): ?>
-                <div class="alert alert-<?= $message['type'] ?>">
-                    <i class="fas fa-<?= $message['type'] === 'success' ? 'check-circle' : 'exclamation-triangle' ?>"></i>
-                    <?= htmlspecialchars($message['text']) ?>
-                </div>
-            <?php endif; ?>
+                <form id="footerForm" method="POST">
+                    <div class="form-group">
+                        <label for="copyright_text">Teks Hak Cipta
+                        <input type="text"
+                               id="copyright_text"
+                               name="copyright_text"
+                               class="form-control"
+                               value="<?= htmlspecialchars($current['copyright_text'], ENT_QUOTES, 'UTF-8') ?>"
+                               placeholder="Contoh: © 2025 &lt;strong&gt;Dapoer Funraise&lt;/strong&gt;"
+                               required>
+                    </div>
 
-            <form method="POST">
-                <div class="form-group">
-                    <label for="copyright_text">Teks Hak Cipta (boleh pakai HTML, contoh: <code>&lt;strong&gt;</code>)</label>
-                    <input type="text"
-                           id="copyright_text"
-                           name="copyright_text"
-                           class="form-control"
-                           value="<?= htmlspecialchars($current['copyright_text'], ENT_QUOTES, 'UTF-8') ?>"
-                           placeholder="Contoh: © 2025 &lt;strong&gt;Dapoer Funraise&lt;/strong&gt;"
-                           required>
-                </div>
+                    <div class="form-group">
+                        <label for="main_text">Teks Utama</label>
+                        <input type="text"
+                               id="main_text"
+                               name="main_text"
+                               class="form-control"
+                               value="<?= htmlspecialchars($current['main_text']) ?>"
+                               placeholder="Contoh: Mendukung Expo Campus MAN 2 Samarinda"
+                               required>
+                    </div>
 
-                <div class="form-group">
-                    <label for="main_text">Teks Utama Footer</label>
-                    <input type="text"
-                           id="main_text"
-                           name="main_text"
-                           class="form-control"
-                           value="<?= htmlspecialchars($current['main_text']) ?>"
-                           placeholder="Contoh: Mendukung Expo Campus MAN 2 Samarinda"
-                           required>
-                </div>
-
-                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Simpan Perubahan
-                    </button>
-                    <a href="index.php" class="btn btn-back">
-                        <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
-                    </a>
-                </div>
-            </form>
+                    <div class="actions">
+                        <a href="../pengaturan.php" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <div class="card">
-            <h2 class="card-title"><i class="fas fa-eye"></i> Preview Footer</h2>
-            <div style="background: #2a1f3d; color: white; padding: 24px; border-radius: 16px; text-align: center;">
-                <p style="font-size: 1.05rem; margin: 0;">
-                    <?= $current['copyright_text'] ?> — 
-                    <?= htmlspecialchars($current['main_text']) ?>
-                </p>
+        <!-- Preview Card -->
+        <div class="card" style="width: 380px; flex-shrink: 0;">
+            <div class="card-header">
+                <i class="fas fa-eye" style="color: var(--secondary);"></i>
+                Preview Footer
+            </div>
+            <div class="card-body" style="display: flex; align-items: center; justify-content: center;">
+                <div class="footer-preview" id="livePreview">
+                    <div class="copyright" id="previewCopyright">
+                        <?= html_entity_decode($current['copyright_text']) ?>
+                    </div>
+                    <div class="main-text" id="previewMain">
+                        <?= htmlspecialchars($current['main_text']) ?>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Client-side confirmation (sesuai preferensi Anda)
-        document.querySelector('form').addEventListener('submit', function(e) {
-            if (!confirm('Apakah Anda yakin ingin menyimpan perubahan pada footer?')) {
+        // Live preview (sesuai preferensi Anda)
+        document.getElementById('copyright_text').addEventListener('input', function() {
+            // Decode HTML entities secara aman (tanpa eval/XSS)
+            const txt = this.value
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&amp;/g, '&')
+                .replace(/&quot;/g, '"')
+                .replace(/&#039;/g, "'");
+            document.getElementById('previewCopyright').innerHTML = txt || '—';
+        });
+
+        document.getElementById('main_text').addEventListener('input', function() {
+            document.getElementById('previewMain').textContent = this.value || '—';
+        });
+
+        // Konfirmasi sebelum submit (sesuai preferensi Anda)
+        document.getElementById('footerForm').addEventListener('submit', function(e) {
+            if (!confirm('Simpan perubahan? Perubahan akan langsung tampil di website.')) {
                 e.preventDefault();
             }
         });

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '.../config.php';
+require_once '../config.php';
 
 if (!isset($_SESSION['username'])) exit;
 
@@ -13,18 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sort = (int)($_POST['sort_order'] ?? 0);
     
     if (!$icon || !$title || !$label || !$href) {
-        $alert = '❌ Semua field wajib diisi.';
+        $alert = 'Semua field wajib diisi.';
     } else {
         try {
             $pdo->prepare("
                 INSERT INTO contact_cards (icon_class, title, label, href, sort_order, is_active)
                 VALUES (?, ?, ?, ?, ?, 1)
             ")->execute([$icon, $title, $label, $href, $sort]);
-            $_SESSION['kontak_alert'] = '✅ Kontak berhasil ditambahkan.';
+            $_SESSION['kontak_alert'] = 'Kontak berhasil ditambahkan.';
             header('Location: pengaturan/kontak.php');
             exit;
         } catch (Exception $e) {
-            $alert = '❌ Gagal menyimpan: ' . $e->getMessage();
+            $alert = 'Gagal menyimpan: ' . $e->getMessage();
         }
     }
 }

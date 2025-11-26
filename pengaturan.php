@@ -33,36 +33,19 @@ if (!isset($_SESSION['username'])) {
             font-family: 'Poppins', sans-serif;
             background: var(--bg);
             color: var(--text);
-            padding: 1rem;
+            padding: 0rem;
             line-height: 1.5;
         }
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 0.5rem;
-        }
-        .header-section {
-            background: var(--card);
-            border-radius: 14px;
-            box-shadow: var(--shadow);
-            padding: 1.2rem 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .header-title h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
+            width: 100vw;  
+            max-width: none;
             margin: 0;
-        }
-        .header-title p {
-            font-size: 0.95rem;
-            color: #666;
-            margin-top: 0.3rem;
+            padding: 0 0rem;
         }
         /* Card Grid */
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
         }
         .card-item {
@@ -143,13 +126,6 @@ if (!isset($_SESSION['username'])) {
 <body>
 
 <div class="container">
-    <div class="header-section">
-        <div class="header-title">
-            <h1>Pengaturan Konten Website</h1>
-            <p>Kelola bagian statis website: header, hero, kontak, dan lainnya.</p>
-        </div>
-    </div>
-
     <div class="cards-grid">
         <!-- Header -->
         <div class="card-item">
@@ -158,23 +134,8 @@ if (!isset($_SESSION['username'])) {
                 <h3 class="card-title">Header</h3>
             </div>
             <div class="card-body">
-                <p class="card-desc">Logo, nama bisnis, dan tagline di bagian atas halaman.</p>
                 <a href="admin/header.php" class="btn btn-outline">
-                    <i class="fas fa-edit"></i> Edit Header
-                </a>
-            </div>
-        </div>
-
-        <!-- Navigasi -->
-        <div class="card-item">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-bars"></i></div>
-                <h3 class="card-title">Navigasi</h3>
-            </div>
-            <div class="card-body">
-                <p class="card-desc">Kelola label dan urutan menu di header.</p>
-                <a href="admin/navigasi.php" class="btn btn-outline">
-                    <i class="fas fa-edit"></i> Edit Navigasi
+                    <i class="fas fa-edit"></i> Edit
                 </a>
             </div>
         </div>
@@ -186,9 +147,8 @@ if (!isset($_SESSION['username'])) {
                 <h3 class="card-title">Hero Section</h3>
             </div>
             <div class="card-body">
-                <p class="card-desc">Background, judul, dan tombol CTA di halaman utama.</p>
                 <a href="admin/hero.php" class="btn btn-outline">
-                    <i class="fas fa-edit"></i> Edit Hero
+                    <i class="fas fa-edit"></i> Edit 
                 </a>
             </div>
         </div>
@@ -200,9 +160,8 @@ if (!isset($_SESSION['username'])) {
                 <h3 class="card-title">Cara Pesan</h3>
             </div>
             <div class="card-body">
-                <p class="card-desc">Judul, subtitle, dan langkah-langkah pemesanan.</p>
                 <a href="admin/cara-pesan.php" class="btn btn-outline">
-                    <i class="fas fa-edit"></i> Edit Cara Pesan
+                    <i class="fas fa-edit"></i> Edit
                 </a>
             </div>
         </div>
@@ -214,9 +173,8 @@ if (!isset($_SESSION['username'])) {
                 <h3 class="card-title">Tentang Kami</h3>
             </div>
             <div class="card-body">
-                <p class="card-desc">Judul, subtitle, isi konten, dan foto kegiatan.</p>
                 <a href="admin/tentang_kami.php" class="btn btn-outline">
-                    <i class="fas fa-edit"></i> Edit Tentang Kami
+                    <i class="fas fa-edit"></i> Edit
                 </a>
             </div>
         </div>
@@ -228,9 +186,8 @@ if (!isset($_SESSION['username'])) {
                 <h3 class="card-title">Kontak</h3>
             </div>
             <div class="card-body">
-                <p class="card-desc">Judul, subtitle, dan daftar kartu kontak (WA, IG, dll).</p>
                 <a href="admin/kontak.php" class="btn btn-outline">
-                    <i class="fas fa-edit"></i> Edit Kontak
+                    <i class="fas fa-edit"></i> Edit
                 </a>
             </div>
         </div>
@@ -242,9 +199,8 @@ if (!isset($_SESSION['username'])) {
                 <h3 class="card-title">Footer</h3>
             </div>
             <div class="card-body">
-                <p class="card-desc">Teks hak cipta dan pesan penutup di bawah halaman.</p>
                 <a href="admin/footer.php" class="btn btn-outline">
-                    <i class="fas fa-edit"></i> Edit Footer
+                    <i class="fas fa-edit"></i> Edit
                 </a>
             </div>
         </div>

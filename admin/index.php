@@ -197,7 +197,7 @@ $tahun_ini = $tahun_pilihan;
         box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
       }
       .filter-bulan-wrapper .btn-apply {
-        background: linear-gradient(to right, #667eea 0%, #764ba2 100%);
+        background: #5A46A2;
         color: white;
         border: none;
         padding: 6px 20px;
@@ -207,8 +207,8 @@ $tahun_ini = $tahun_pilihan;
         transition: transform 0.2s;
       }
       .filter-bulan-wrapper .btn-apply:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px #4a3a8a;
       }
       .filter-bulan-wrapper label {
         margin: 0;
@@ -566,7 +566,7 @@ $tahun_ini = $tahun_pilihan;
                 <div class="col-12">
                   <div class="card iframe-card">
                     <div class="card-body">
-                      <iframe src="../lihat_testimoni.php" class="iframe-container" frameborder="0" scrolling="auto" loading="lazy" title="Lihat Testimoni"></iframe>
+                      <iframe src="../testimoni.php" class="iframe-container" frameborder="0" scrolling="auto" loading="lazy" title="Lihat Testimoni"></iframe>
                     </div>
                   </div>
                 </div>
@@ -601,19 +601,6 @@ $tahun_ini = $tahun_pilihan;
               </div>
 
           </div>
-
-          
-          <!-- Footer -->
-          <footer class="footer">
-            <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">
-                Copyright © <?= date('Y') ?> Dapoer Funraise. All rights reserved.
-              </span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">
-                Cemilan rumahan yang bikin nagih! <i class="mdi mdi-heart text-danger"></i>
-              </span>
-            </div>
-          </footer>
         </div>
       </div>
     </div>

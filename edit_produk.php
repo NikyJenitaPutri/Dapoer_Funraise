@@ -91,449 +91,515 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Edit Produk – Dapoer Funraise</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #5A46A2;
-            --secondary: #B64B62;
-            --accent: #F9CC22;
-            --bg-light: #FFF5EE;
-            --soft: #DFBEE0;
-            --text-muted: #9180BB;
-        }
+:root {
+    --primary: #5A46A2;
+    --secondary: #B64B62;
+    --accent: #F9CC22;
+    --bg-light: #FFF5EE;
+    --soft: #DFBEE0;
+    --text-muted: #9180BB;
+    --border: #f0eaff;
+    --shadow: 0 4px 12px rgba(90, 70, 162, 0.1);
+    
+    --fs-xs: 0.8125rem;
+    --fs-sm: 0.875rem;
+    --fs-md: 0.9375rem;
+    --fs-lg: 1rem;
+    --gap-xs: 0.4rem;
+    --gap-sm: 0.6rem;
+    --gap-md: 0.8rem;
+    --gap-lg: 1rem;
+    --radius: 8px;
+    --btn-h: 38px;
+}
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        html, body {
-            height: 100%;
-        }
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #faf9ff;
+    color: #333;
+    padding:0;
+    font-size: var(--fs-md);
+    line-height: 1.5;
+}
 
-        body {
-            font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, var(--bg-light) 0%, #f9f5ff 100%);
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            font-size: 15px;
-        }
+.main-wrapper {
+    display: flex;
+    gap: var(--gap-md);
+    max-width: 1080px;
+    margin: 0 auto;
+}
 
-        .app-content {
-            flex: 1;
-            display: flex;
-            padding: 1.5rem;
-            overflow: auto;
-        }
+.form-box,
+.preview-box {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
 
-        .form-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(90, 70, 162, 0.18);
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(0,0,0,0.03);
-            min-height: calc(100vh - 3rem);
-        }
+.form-header {
+    background: #f9f7ff;
+    color: var(--primary);
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 
-        .card-header {
-            background: linear-gradient(120deg, #f5f3ff, #faf5ff);
-            color: var(--primary);
-            padding: 1.2rem 1.8rem;
-            font-size: 1.3rem;
-            font-weight: 700;
-            border-bottom: 1px solid #f0eaff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+.form-body {
+    padding: var(--gap-sm);
+}
 
-        .card-body {
-            flex: 1;
-            padding: 2rem;
-        }
+.form-group {
+    margin-bottom: var(--gap-md);
+}
 
-        .alert {
-            background: #fff8f8;
-            color: #c0392b;
-            padding: 14px 18px;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid var(--secondary);
-            font-weight: 600;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 2px 8px rgba(182, 75, 98, 0.1);
-        }
+.form-row {
+    display: grid;
+    gap: var(--gap-md);
+    margin-bottom: var(--gap-md);
+}
 
-        .row-1 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
+.form-row-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
 
-        .row-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-            align-items: start;
-        }
+.form-row-desc-foto {
+    grid-template-columns: 2fr 1fr;
+}
 
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--primary);
-            font-size: 1.05rem;
-        }
-        .required { color: var(--secondary); }
+.form-row .form-group {
+    margin-bottom: 0;
+}
 
-        .form-group input[type="text"],
-        .form-group input[type="number"],
-        .form-group textarea {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e8e6f2;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-family: inherit;
-            transition: all 0.25s;
-            background: #faf9ff;
-        }
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(90, 70, 162, 0.15);
-            background: white;
-        }
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+    font-size: var(--fs-md);
+    color: var(--primary);
+}
+.required { color: var(--secondary); }
 
-        .form-group textarea {
-            min-height: 180px;
-            resize: vertical;
-        }
+input[type="text"],
+input[type="number"],
+input[type="file"],
+textarea {
+    width: 100%;
+    padding: 7px 10px;
+    border: 2px solid #e8e6f2;
+    border-radius: var(--radius);
+    font-size: var(--fs-md);
+    background: #fcfbff;
+    font-family: inherit;
+    transition: border-color 0.2s, background 0.2s;
+}
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.1);
+}
 
-        .help {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 5px;
-            font-style: italic;
-        }
+textarea {
+    min-height: 76px;
+    resize: vertical;
+}
 
-        .file-control { 
-            position: relative; 
-        }
-        .file-input { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            opacity: 0; 
-            cursor: pointer; 
-        }
-        .file-meta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #fbf9ff;
-            border: 2px dashed var(--soft);
-            border-radius: 12px;
-            padding: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            min-height: 56px;
-        }
-        .file-meta:hover {
-            background: #f5f0ff;
-            border-color: var(--primary);
-        }
-        .file-name {
-            flex: 1;
-            font-size: 0.95rem;
-            color: #444;
-            font-weight: 500;
-            word-break: break-word;
-        }
+.help {
+    display: block;
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+    margin-top: 3px;
+    font-style: italic;
+}
 
-        .preview-box {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            justify-content: flex-start;
-        }
-        .preview-label {
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 1.05rem;
-            margin-bottom: 8px;
-        }
-        .preview-img-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 220px;
-            background: #fcfbff;
-            border: 2px solid #f0eaff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .preview-img {
-            max-width: 100%;
-            max-height: 200px;
-            height: auto;
-            object-fit: contain;
-            display: block;
-        }
-        .no-preview {
-            color: var(--text-muted);
-            font-style: italic;
-            text-align: center;
-            padding: 1.5rem;
-            font-size: 0.95rem;
-        }
+.variant-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+    min-height: 18px;
+}
+.variant-tag {
+    background: var(--soft);
+    color: var(--primary);
+    padding: 2px 7px;
+    border-radius: 14px;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
 
-        .form-footer {
-            margin-top: 1rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #eee8ff;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+.action-bar {
+    padding: 0.6rem 1rem;
+    background: #fbf9ff;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+}
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            text-decoration: none;
-            border: none;
-            transition: all 0.3s;
-            font-family: inherit;
-            min-height: 48px;
-        }
+.preview-box {
+    width: 260px;
+    flex-shrink: 0;
+}
 
-        .btn-primary {
-            background: linear-gradient(135deg, var(--secondary), #9e3e52);
-            color: white;
-            flex: 1;
-            box-shadow: 0 4px 12px rgba(182, 75, 98, 0.25);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(182, 75, 98, 0.35);
-        }
-        .btn-secondary {
-            background: linear-gradient(135deg, var(--soft), #c8a5d0);
-            color: var(--primary);
-            flex: 1;
-        }
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, #d0a8d5, #c095cb);
-        }
+.preview-header {
+    background: #f9f7ff;
+    color: var(--secondary);
+    padding: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}
 
-        @media (max-width: 767px) {
-            body { font-size: 14px; }
-            .app-content { padding: 1rem; }
-            .form-card { min-height: auto; }
-            .row-1,
-            .row-2 {
-                grid-template-columns: 1fr;
-            }
-            .form-group input,
-            .form-group textarea {
-                font-size: 0.95rem;
-                padding: 12px 14px;
-            }
-            .card-body { padding: 1.5rem; }
-            .form-footer { flex-direction: column; }
-            .btn { font-size: 0.95rem; padding: 12px; }
-            .preview-img-container { min-height: 180px; }
-            .preview-img { max-height: 160px; }
-        }
+.preview-body {
+    padding: var(--gap-sm);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-xs);
+}
+
+.preview-img-container {
+    position: relative;
+}
+.preview-img-placeholder,
+.preview-img {
+    width: 250px;
+    height: 250px;
+    border-radius: var(--radius);
+    background: #fcfbff;
+}
+.preview-img-placeholder {
+    border: 1.5px dashed var(--soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 1.4rem;
+}
+.preview-img {
+    object-fit: contain;
+}
+
+.preview-text h3 {
+    color: var(--primary);
+    margin: 4px 0 2px;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.preview-meta {
+    font-size: var(--fs-sm);
+    color: var(--primary);
+    margin-bottom: 2px;
+}
+.preview-meta span {
+    color: var(--secondary);
+    font-weight: 600;
+}
+
+.preview-text p {
+    font-size: var(--fs-xs);
+    color: #555;
+    margin-top: 0;
+    line-height: 1.4;
+    max-height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 14px;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: var(--fs-md);
+    cursor: pointer;
+    text-decoration: none;
+    border: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    min-height: var(--btn-h);
+    white-space: nowrap;
+}
+.btn-primary {
+    background: var(--secondary);
+    color: white;
+    flex: 1;
+}
+.btn-primary:hover {
+    background: #a34056;
+    transform: translateY(-1px);
+}
+.btn-secondary {
+    background: var(--soft);
+    color: var(--primary);
+    flex: 1;
+}
+.btn-secondary:hover {
+    background: #d5b4d9;
+}
+
+.alert {
+    background: #fff8f8;
+    color: #c0392b;
+    padding: 7px 12px;
+    border-radius: var(--radius);
+    margin-bottom: var(--gap-sm);
+    border-left: 3px solid var(--secondary);
+    font-size: var(--fs-xs);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 1px 5px rgba(182, 75, 98, 0.08);
+}
+
+@media (max-width: 768px) {
+    body { padding: var(--gap-xs); }
+    .main-wrapper {
+        flex-direction: column;
+    }
+    .preview-box {
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto;
+    }
+    .preview-img-placeholder,
+    .preview-img {
+        width: 120px;
+        height: 120px;
+    }
+    .form-body,
+    .action-bar {
+        padding: var(--gap-xs);
+    }
+    .form-header {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.95rem;
+    }
+    .form-row-3 {
+        grid-template-columns: 1fr;
+    }
+    .form-row-desc-foto {
+        grid-template-columns: 1fr;
+    }
+}
     </style>
 </head>
 <body>
-    <main class="app-content">
-        <div class="form-card">
-            <div class="card-header">
-                <i class="fas fa-edit" style="color: var(--secondary);"></i>
-                Edit Detail Produk
+    <div class="main-wrapper">
+        <div class="form-box">
+            <div class="form-header">
+                <i class="fas fa-edit"></i>
+                Edit Produk
             </div>
-            <div class="card-body">
+            <div class="form-body">
                 <?php if ($msg): ?>
                     <div class="alert">
                         <i class="fas fa-exclamation-circle"></i>
-                        <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?>
+                        <?php echo htmlspecialchars($msg, ENT_QUOTES, 'UTF-8'); ?>
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" enctype="multipart/form-data">
-                    <div class="row-1">
+                <form id="editForm" method="POST" enctype="multipart/form-data">
+                    <div class="form-row form-row-3">
                         <div class="form-group">
                             <label for="nama">Nama Produk <span class="required">*</span></label>
-                            <input id="nama" type="text" name="nama" value="<?= htmlspecialchars($p['Nama'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required maxlength="100">
+                            <input 
+                                id="nama" 
+                                type="text" 
+                                name="nama" 
+                                value="<?php echo htmlspecialchars($p['Nama'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" 
+                                required 
+                                maxlength="100"
+                            >
                         </div>
+                        
                         <div class="form-group">
                             <label for="harga">Harga (Rp) <span class="required">*</span></label>
-                            <input id="harga" type="number" step="1" min="1" name="harga" value="<?= (int)($p['Harga'] ?? 0) ?>" required>
-                            <small class="help">Contoh: 125000</small>
+                            <input 
+                                id="harga" 
+                                type="number" 
+                                step="1" 
+                                min="1" 
+                                name="harga" 
+                                value="<?php echo (int)($p['Harga'] ?? 0); ?>" 
+                                required
+                            >
+                            <small class="help">Tanpa titik/koma</small>
                         </div>
+                        
                         <div class="form-group">
-                            <label for="varian">Varian</label>
-                            <input id="varian" type="text" name="varian" value="<?= htmlspecialchars($p['Varian'] ?? '', ENT_QUOTES, 'UTF-8') ?>" 
-                                   placeholder="S,M,L atau Nude,Mocha">
+                            <label for="varian">Varian (Opsional)</label>
+                            <input 
+                                id="varian" 
+                                type="text" 
+                                name="varian" 
+                                value="<?php echo htmlspecialchars($p['Varian'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" 
+                                placeholder="S,M,L"
+                            >
                             <small class="help">Pisahkan dengan koma</small>
+                            <div class="variant-tags" id="variantPreview"></div>
                         </div>
                     </div>
 
-                    <div class="row-2">
+                    <div class="form-row form-row-desc-foto">
                         <div class="form-group">
                             <label for="deskripsi">Deskripsi</label>
-                            <textarea id="deskripsi" name="deskripsi" rows="8"><?= htmlspecialchars($p['Deskripsi_Produk'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+                            <textarea 
+                                id="deskripsi" 
+                                name="deskripsi"
+                                placeholder="Ceritakan keunggulan produk..."
+                                maxlength="2000"
+                            ><?php echo htmlspecialchars($p['Deskripsi_Produk'] ?? '', ENT_QUOTES, 'UTF-8'); ?></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label for="foto">Unggah Gambar</label>
-                            <div class="file-control">
-                                <input id="foto" class="file-input" type="file" name="foto" accept="image/*">
-                                <div class="file-meta">
-                                    <span class="file-name"><?= htmlspecialchars($p['Foto_Produk'] ?? 'Pilih file...', ENT_QUOTES, 'UTF-8') ?></span>
-                                    <button type="button" class="btn btn-secondary" style="padding:8px 14px;font-size:0.85rem;flex:none;min-height:auto;" onclick="resetFile()">
-                                        <i class="fas fa-undo"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <small class="help">Maks. 5MB (JPG/PNG/WebP)</small>
+                            <label for="foto">Foto Produk</label>
+                            <input 
+                                id="foto" 
+                                type="file" 
+                                name="foto" 
+                                accept="image/jpeg,image/png,image/webp"
+                            >
+                            <small class="help">JPG/PNG/WEBP (≤3MB)</small>
                         </div>
-
-                        <div class="form-group preview-box">
-                            <label class="preview-label">Gambar</label>
-                            <div class="preview-img-container">
-                                <?php 
-                                $foto = $p['Foto_Produk'] ?? '';
-                                if (!empty($foto) && file_exists(__DIR__ . '/uploads/' . $foto)): 
-                                ?>
-                                    <img id="previewImg" class="preview-img" src="uploads/<?= htmlspecialchars($foto, ENT_QUOTES, 'UTF-8') ?>" alt="Produk">
-                                <?php else: ?>
-                                    <div class="no-preview">
-                                        <i class="fas fa-image fa-3x" style="color:#ddd;margin-bottom:0.5rem;"></i><br>
-                                        Belum ada gambar
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-footer">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Simpan Perubahan
-                        </button>
-                        <a href="./admin/daftar_produk.php" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Batal
-                        </a>
                     </div>
                 </form>
             </div>
+
+            <div class="action-bar">
+                <a href="./admin/daftar_produk.php" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Batal
+                </a>
+                <button type="submit" form="editForm" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </div>
         </div>
-    </main>
+
+        <div class="preview-box">
+            <div class="preview-header">
+                <i class="fas fa-eye"></i> Preview
+            </div>
+            <div class="preview-body">
+                <div class="preview-img-container">
+                    <?php 
+                    $foto = $p['Foto_Produk'] ?? '';
+                    if (!empty($foto) && file_exists(__DIR__ . '/uploads/' . $foto)): 
+                    ?>
+                        <img id="livePreviewImg" class="preview-img" src="uploads/<?php echo htmlspecialchars($foto, ENT_QUOTES, 'UTF-8'); ?>" alt="Preview">
+                    <?php else: ?>
+                        <div class="preview-img-placeholder">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <img id="livePreviewImg" class="preview-img" src="" alt="Preview" style="display:none;">
+                    <?php endif; ?>
+                </div>
+                <div class="preview-text">
+                    <h3 id="liveNama"><?php echo htmlspecialchars($p['Nama'] ?? 'Nama Produk'); ?></h3>
+                    <div class="preview-meta">
+                        <span id="liveHarga">Rp <?php echo number_format($p['Harga'] ?? 0, 0, ',', '.'); ?></span>
+                        <span id="liveVarianDisplay"></span>
+                    </div>
+                    <p id="liveDeskripsi"><?php echo htmlspecialchars($p['Deskripsi_Produk'] ?? 'Deskripsi produk akan muncul...'); ?></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        function resetFile() {
-            const input = document.getElementById('foto');
-            const fileName = document.querySelector('.file-name');
-            const preview = document.getElementById('previewImg');
-            input.value = '';
-            
-            const defaultName = '<?= htmlspecialchars($p['Foto_Produk'] ?? "Pilih file...", ENT_QUOTES, "UTF-8") ?>';
-            fileName.textContent = defaultName;
-
-            <?php if (!empty($p['Foto_Produk']) && file_exists(__DIR__ . '/uploads/' . $p['Foto_Produk'])): ?>
-                if (preview) {
-                    preview.src = 'uploads/<?= htmlspecialchars($p['Foto_Produk'], ENT_QUOTES, 'UTF-8') ?>';
-                    preview.parentNode.querySelector('.no-preview')?.remove();
-                    preview.style.display = 'block';
-                }
-            <?php else: ?>
-                if (preview) {
-                    preview.style.display = 'none';
-                    let container = preview.closest('.preview-img-container');
-                    if (!container.querySelector('.no-preview')) {
-                        const fallback = document.createElement('div');
-                        fallback.className = 'no-preview';
-                        fallback.innerHTML = `<i class="fas fa-image fa-3x" style="color:#ddd;margin-bottom:0.5rem;"></i><br>Belum ada gambar`;
-                        container.appendChild(fallback);
-                    }
-                }
-            <?php endif; ?>
+        function formatRupiah(num) {
+            const n = parseFloat(num) || 0;
+            return 'Rp ' + n.toLocaleString('id-ID');
         }
 
-        document.getElementById('foto')?.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('previewImg');
-            const fileName = document.querySelector('.file-name');
-            const container = document.querySelector('.preview-img-container');
-            const fallback = container.querySelector('.no-preview');
+        const updateVarianText = (variants) => {
+            return variants.length ? variants.join(', ') : '';
+        };
 
-            if (!file) {
-                fileName.textContent = '<?= htmlspecialchars($p['Foto_Produk'] ?? "Pilih file...", ENT_QUOTES, "UTF-8") ?>';
-                resetFile();
-                return;
-            }
+        const namaInput = document.getElementById('nama');
+        const hargaInput = document.getElementById('harga');
+        const varianInput = document.getElementById('varian');
+        const deskripsiInput = document.getElementById('deskripsi');
+        const fotoInput = document.getElementById('foto');
+        const liveNama = document.getElementById('liveNama');
+        const liveHarga = document.getElementById('liveHarga');
+        const liveVarianDisplay = document.getElementById('liveVarianDisplay');
+        const liveDeskripsi = document.getElementById('liveDeskripsi');
+        const livePreviewImg = document.getElementById('livePreviewImg');
+        const placeholder = document.querySelector('.preview-img-placeholder');
+        const variantPreview = document.getElementById('variantPreview');
 
-            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                fileName.textContent = '❌ Format tidak didukung';
-                setTimeout(resetFile, 2000);
-                return;
-            }
+        liveNama.textContent = namaInput.value || 'Nama Produk';
+        liveHarga.textContent = formatRupiah(hargaInput.value);
+        liveDeskripsi.textContent = deskripsiInput.value || 'Deskripsi produk akan muncul...';
 
-            if (file.size > 5 * 1024 * 1024) {
-                fileName.textContent = '❌ File >5MB';
-                setTimeout(resetFile, 2000);
-                return;
-            }
+        (() => {
+            const vars = varianInput.value.split(',').map(v => v.trim()).filter(v => v);
+            liveVarianDisplay.textContent = vars.length ? ' • ' + updateVarianText(vars) : '';
+            updateVariantPreview();
+        })();
 
-            fileName.textContent = file.name;
-
-            if (fallback) fallback.remove();
-
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (preview) {
-                    preview.src = reader.result;
-                    preview.style.display = 'block';
-                } else {
-                    const img = document.createElement('img');
-                    img.id = 'previewImg';
-                    img.className = 'preview-img';
-                    img.src = reader.result;
-                    container.innerHTML = '';
-                    container.appendChild(img);
-                }
-            };
-            reader.onerror = () => {
-                fileName.textContent = 'Gagal membaca file';
-                setTimeout(resetFile, 2000);
-            };
-            reader.readAsDataURL(file);
+        namaInput.addEventListener('input', () => liveNama.textContent = namaInput.value || 'Nama Produk');
+        hargaInput.addEventListener('input', () => liveHarga.textContent = formatRupiah(hargaInput.value));
+        deskripsiInput.addEventListener('input', () => liveDeskripsi.textContent = deskripsiInput.value || 'Deskripsi produk akan muncul...');
+        varianInput.addEventListener('input', () => {
+            const vars = varianInput.value.split(',').map(v => v.trim()).filter(v => v);
+            liveVarianDisplay.textContent = vars.length ? ' • ' + updateVarianText(vars) : '';
+            updateVariantPreview();
         });
+
+        fotoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    livePreviewImg.src = ev.target.result;
+                    livePreviewImg.style.display = 'block';
+                    if (placeholder) placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function updateVariantPreview() {
+            const variants = varianInput.value
+                ? varianInput.value.split(',').map(v => v.trim()).filter(v => v)
+                : [];
+            variantPreview.innerHTML = variants.map(v =>
+                `<span class="variant-tag"><i class="fas fa-tag"></i> ${v}</span>`
+            ).join('');
+        }
+
+        updateVariantPreview();
     </script>
 </body>
 </html>

@@ -2,273 +2,384 @@
 session_start();
 require_once '../config.php';
 
-// Pastikan user sudah login
 if (!isset($_SESSION['username'])) {
     header('Location: ../login.php');
     exit;
 }
 
-// Ambil data hero saat ini
 $stmt = $pdo->query("SELECT * FROM hero_section WHERE id = 1");
 $hero = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Jika belum ada record, buat default
 if (!$hero) {
-    $defaultData = [
-        'background_path' => 'assets/bg.jpg',
-        'cta_button_text' => 'Lihat Produk'
-    ];
-    $stmtIns = $pdo->prepare("
-        INSERT INTO hero_section (background_path, cta_button_text) 
-        VALUES (?, ?)
-    ");
-    $stmtIns->execute([$defaultData['background_path'], $defaultData['cta_button_text']]);
-    $hero = $defaultData;
+    $defaultPath = 'assets/bg.jpg';
+    $stmtIns = $pdo->prepare("INSERT INTO hero_section (background_path) VALUES (?)");
+    $stmtIns->execute([$defaultPath]);
+    $hero = ['background_path' => $defaultPath, 'id' => 1];
 }
 
 $alert = '';
+$alertType = 'success';
 if (isset($_SESSION['hero_alert'])) {
     $alert = $_SESSION['hero_alert'];
+    $alertType = strpos($_SESSION['hero_alert'], 'Gagal') !== false ? 'error' : 'success';
     unset($_SESSION['hero_alert']);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hero Section — Admin</title>
+    <title>Hero Section — Dapoer Funraise</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #B64B62;
-            --secondary: #5A46A2;
+            --primary: #5A46A2;
+            --secondary: #B64B62;
             --accent: #F9CC22;
-            --cream: #FFF5EE;
-            --dark: #2a1f3d;
-            --font-main: 'Poppins', sans-serif;
-            --transition: all 0.3s ease;
+            --bg-light: #FFF5EE;
+            --soft: #DFBEE0;
+            --text-muted: #9180BB;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: var(--font-main);
-            background-color: #f9f7fc;
+            font-family: 'Poppins', sans-serif;
+            background: #f1e8fdff;
             color: #333;
-            padding: 20px;
+            font-size: 15px;
+            line-height: 1.5;
         }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(90, 70, 162, 0.1);
-            overflow: hidden;
-        }
-        header {
-            background: linear-gradient(90deg, var(--secondary), var(--primary));
-            color: white;
-            padding: 1rem 2rem;
+
+        .main-wrapper {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 0;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
         }
-        .header-title { font-size: 1.5rem; font-weight: 600; }
-        .header-title i { margin-right: 8px; }
-        .nav-actions a {
-            color: white;
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 500;
-            transition: var(--transition);
-            text-decoration: none;
+
+        @media (max-width: 768px) {
+            .main-wrapper {
+                flex-direction: column;
+            }
         }
-        .nav-actions a:hover { background: rgba(255,255,255,0.3); }
-        .content {
-            padding: 30px;
+
+        .form-box {
+            flex: 1;
+            background: white;
+            box-shadow: 0 5px 20px rgba(90, 70, 162, 0.1);
+            overflow: hidden;
+            border: 1px solid #f0eaff;
+            margin: 0;
+            border-radius: 0;
         }
-        .section-heading {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--dark);
+
+        .preview-box {
+            width: 380px;
+            flex-shrink: 0;
+            background: white;
+            box-shadow: 0 5px 20px rgba(90, 70, 162, 0.1);
+            overflow: hidden;
+            border: 1px solid #f0eaff;
+            margin: 0;
+            border-radius: 0;
         }
-        .alert {
-            padding: 14px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+
+        @media (max-width: 768px) {
+            .preview-box {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        .form-header, .preview-header {
+            background: #faf5ff;
+            padding: 0.9rem 1.4rem;
+            font-size: 1.2rem;
             font-weight: 600;
-            text-align: left;
+            border-bottom: 1px solid #f0eaff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #a7f3d0;
+
+        .form-header { color: var(--primary); }
+        .preview-header { color: var(--secondary); justify-content: center; }
+
+        .form-body {
+            padding: 1.5rem 1.4rem 1rem;
         }
-        .alert-error {
-            background: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
+
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 1rem;
         }
+
         .form-group label {
             display: block;
-            margin-bottom: 8px;
             font-weight: 600;
-            color: var(--dark);
-            font-size: 1.05rem;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            color: var(--primary);
         }
-        .form-control {
-            width: 100%;
-            padding: 14px 18px;
-            border-radius: 12px;
-            border: 2px solid #e0d6eb;
-            font-size: 1.05rem;
-            transition: var(--transition);
-            background: white;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.2);
-        }
-        .form-row {
+
+        .upload-area {
+            position: relative;
             display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 18px 16px;
+            border: 2px dashed var(--soft);
+            border-radius: 10px;
+            background: #faf9ff;
+            cursor: pointer;
         }
-        .form-col {
-            flex: 1;
-            min-width: 250px;
+
+        .upload-area i {
+            font-size: 1.6rem;
+            color: var(--text-muted);
         }
-        .preview-box {
-            background: #faf9fc;
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            margin-top: 10px;
+
+        .upload-text {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--primary);
         }
-        .preview-box img {
-            max-width: 100%;
-            max-height: 200px;
+
+        .upload-hint {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .upload-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .help {
+            display: block;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        .alert {
+            background: #fff8f8;
+            color: #c0392b;
+            padding: 10px 14px;
             border-radius: 8px;
-            object-fit: cover;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 7px;
         }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 3px solid #66bb6a;
+        }
+
+        .action-bar {
+            padding: 0.8rem 1.4rem 0.9rem;
+            background: #fbf9ff;
+            border-top: 1px solid #f3f0ff;
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .action-bar {
+                flex-direction: column;
+            }
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 14px 28px;
-            border-radius: 12px;
+            justify-content: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 1.05rem;
+            font-size: 0.92rem;
             cursor: pointer;
-            transition: var(--transition);
+            text-decoration: none;
             border: none;
-            text-align: center;
+            transition: all 0.15s;
+            font-family: inherit;
+            min-height: 40px;
         }
+
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #d05876);
+            background: linear-gradient(135deg, var(--secondary), #9e3e52);
             color: white;
+            flex: 1;
+            box-shadow: 0 2px 8px rgba(182, 75, 98, 0.2);
         }
+
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(182, 75, 98, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(182, 75, 98, 0.25);
         }
-        .btn-gray {
-            background: #9e9e9e;
-            color: white;
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--soft), #c8a5d0);
+            color: var(--primary);
+            flex: 1;
         }
-        .btn-gray:hover {
-            background: #757575;
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #d0a8d5, #c095cb);
         }
-        .actions {
+
+        .preview-body {
+            padding: 1.5rem;
+            text-align: center;
             display: flex;
-            gap: 12px;
-            margin-top: 20px;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.1rem;
         }
-        @media (max-width: 600px) {
-            .form-row { flex-direction: column; }
-            .actions { flex-direction: column; }
-            .btn { width: 100%; justify-content: center; }
+
+        .preview-img-container {
+            width: 100%;
+            max-width: 320px;
+            height: 200px;
+            background: #faf9ff;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+
+        .preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-filename {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            max-width: 90%;
+            word-break: break-all;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-title">
-                <i class="fas fa-home"></i> Hero Section
+    <div class="main-wrapper">
+        <div class="form-box">
+            <div class="form-header">
+                <i class="fas fa-image" style="color: var(--secondary);"></i>
+                Hero Section
             </div>
-            <div class="nav-actions">
-                <a href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+
+            <div class="form-body">
+                <?php if ($alert): ?>
+                    <div class="alert <?= $alertType === 'success' ? 'alert-success' : '' ?>">
+                        <i class="fas fa-<?= $alertType === 'success' ? 'check-circle' : 'exclamation-circle' ?>"></i>
+                        <?= htmlspecialchars($alert) ?>
+                    </div>
+                <?php endif; ?>
+
+                <form id="heroForm" action="update_hero.php" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label>Upload Background Hero</label>
+                        <div class="upload-area" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <div class="upload-text" id="uploadFileName">Klik atau seret file</div>
+                            <div class="upload-hint">JPG, PNG, WebP • ≤2 MB</div>
+                            <input 
+                                type="file" 
+                                id="background_image" 
+                                name="background_image" 
+                                class="upload-input"
+                                accept=".jpg,.jpeg,.png,.webp"
+                                required
+                            >
+                        </div>
+                        <small class="help">Gambar ini akan ditampilkan sebagai background pada hero section halaman utama</small>
+                    </div>
+                </form>
             </div>
-        </header>
 
-        <div class="content">
-            <h2 class="section-heading">Kelola Tampilan Beranda</h2>
+            <div class="action-bar">
+                <a href="../pengaturan.php" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+                <button type="submit" form="heroForm" name="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan Hero
+                </button>
+            </div>
+        </div>
 
-            <?php if ($alert): ?>
-                <div class="alert <?= strpos($alert, 'Gagal') !== false ? 'alert-error' : 'alert-success' ?>">
-                    <?= htmlspecialchars($alert) ?>
+        <div class="preview-box">
+            <div class="preview-header">
+                <i class="fas fa-eye"></i> Preview Hero Section
+            </div>
+            <div class="preview-body">
+                <div class="preview-img-container">
+                    <?php
+                    $path = $hero['background_path'];
+                    $url = (filter_var($path, FILTER_VALIDATE_URL)) ? $path : '../' . htmlspecialchars($path);
+                    ?>
+                    <img 
+                        src="<?= $url ?>" 
+                        class="preview-img"
+                        id="previewImg"
+                        onerror="this.src='../assets/bg.jpg'; this.onerror=null;"
+                        alt="Hero Background"
+                    >
                 </div>
-            <?php endif; ?>
-
-            <form action="update_hero.php" method="POST" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="cta_button_text">Teks Tombol CTA</label>
-                    <input type="text" 
-                           id="cta_button_text" 
-                           name="cta_button_text" 
-                           class="form-control"
-                           value="<?= htmlspecialchars($hero['cta_button_text']) ?>"
-                           placeholder="Contoh: Lihat Produk"
-                           required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label for="background_image">Ganti Gambar Latar (Opsional)</label>
-                            <input type="file" 
-                                   id="background_image" 
-                                   name="background_image" 
-                                   class="form-control"
-                                   accept="image/jpeg,image/png,image/webp">
-                            <small style="display:block; margin-top:6px; color:#666;">
-                                Format: JPG, PNG, WebP (Maks. 2 MB)
-                            </small>
-                        </div>
-                    </div>
-                    <div class="form-col">
-                        <label>Gambar Saat Ini</label>
-                        <div class="preview-box">
-                            <?php
-                            $bgPath = $hero['background_path'];
-                            $bgUrl = (filter_var($bgPath, FILTER_VALIDATE_URL)) ? $bgPath : '../' . $bgPath;
-                            ?>
-                            <img src="<?= htmlspecialchars($bgUrl) ?>" alt="Background saat ini">
-                            <p style="margin-top:8px; font-size:0.9rem; color:#555;">
-                                <?= basename($bgPath) ?>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="actions">
-                    <button type="submit" name="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Simpan Perubahan
-                    </button>
-                    <a href="index.php" class="btn btn-gray">
-                        <i class="fas fa-arrow-left"></i> Kembali
-                    </a>
-                </div>
-            </form>
+                <div class="preview-filename" id="previewFilename"><?= htmlspecialchars(basename($path)) ?></div>
+            </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('background_image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const uploadFileName = document.getElementById('uploadFileName');
+            const previewImg = document.getElementById('previewImg');
+            const previewFilename = document.getElementById('previewFilename');
+            
+            if (file) {
+                // Truncate filename if too long
+                let name = file.name;
+                if (name.length > 20) name = name.substring(0, 17) + '...';
+                uploadFileName.textContent = name;
+                previewFilename.textContent = file.name;
+
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = ev => previewImg.src = ev.target.result;
+                reader.readAsDataURL(file);
+            } else {
+                uploadFileName.textContent = 'Klik atau seret file';
+                previewFilename.textContent = 'Tidak ada file';
+            }
+        });
+    </script>
 </body>
 </html>

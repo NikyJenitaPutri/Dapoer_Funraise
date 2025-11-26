@@ -21,12 +21,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 unlink($path);
             }
             $pdo->prepare("DELETE FROM carousel_photos WHERE id = ?")->execute([$id]);
-            $_SESSION['tk_alert'] = '✅ Foto berhasil dihapus.';
+            $_SESSION['tk_alert'] = 'Foto berhasil dihapus.';
         } else {
-            $_SESSION['tk_alert'] = '❌ Foto tidak ditemukan di database.';
+            $_SESSION['tk_alert'] = 'Foto tidak ditemukan di database.';
         }
     } else {
-        $_SESSION['tk_alert'] = '❌ ID tidak valid.';
+        $_SESSION['tk_alert'] = 'ID tidak valid.';
     }
 }
 

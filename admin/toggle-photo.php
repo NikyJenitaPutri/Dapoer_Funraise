@@ -12,20 +12,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if (!$id) {
-        $_SESSION['tk_alert'] = '❌ ID foto tidak valid.';
+        $_SESSION['tk_alert'] = 'ID foto tidak valid.';
     } else {
         try {
             if ($action === 'activate') {
                 $pdo->prepare("UPDATE carousel_photos SET is_active = 1 WHERE id = ?")->execute([$id]);
-                $_SESSION['tk_alert'] = '✅ Foto diaktifkan.';
+                $_SESSION['tk_alert'] = 'Foto diaktifkan.';
             } elseif ($action === 'deactivate') {
                 $pdo->prepare("UPDATE carousel_photos SET is_active = 0 WHERE id = ?")->execute([$id]);
-                $_SESSION['tk_alert'] = '✅ Foto dinonaktifkan.';
+                $_SESSION['tk_alert'] = 'Foto dinonaktifkan.';
             } else {
-                $_SESSION['tk_alert'] = '❌ Aksi tidak dikenali.';
+                $_SESSION['tk_alert'] = 'Aksi tidak dikenali.';
             }
         } catch (Exception $e) {
-            $_SESSION['tk_alert'] = '❌ Gagal memperbarui status.';
+            $_SESSION['tk_alert'] = 'Gagal memperbarui status.';
         }
     }
 }

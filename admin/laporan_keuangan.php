@@ -19,6 +19,21 @@ function namaBulan($bulan) {
     return $nama[(int)$bulan] ?? 'Bulan';
 }
 
+function formatProduk($produkJson) {
+    $items = json_decode($produkJson, true);
+    if (!is_array($items)) {
+        return htmlspecialchars($produkJson ?: '–');
+    }
+
+    $list = [];
+    foreach ($items as $item) {
+        $nama = htmlspecialchars($item['nama'] ?? '–');
+        $qty  = (int)($item['qty'] ?? 1);
+        $list[] = "{$nama} × {$qty}";
+    }
+    return !empty($list) ? implode('<br>', $list) : '–';
+}
+
 $bulan_nama = namaBulan($bulan);
 
 // Handle CSV download
@@ -27,13 +42,13 @@ if (isset($_GET['download']) && $_GET['download'] == 'csv') {
     header('Content-Disposition: attachment;filename=laporan_keuangan_'.$bulan.'_'.$tahun.'.csv');
     
     $output = fopen('php://output', 'w');
-    fputcsv($output, ['No', 'Tanggal', 'Nama Pelanggan', 'Total (Rp)', 'Status']);
+    fputcsv($output, ['No', 'Tanggal', 'Nama Pelanggan', 'Produk', 'Total (Rp)', 'Status']);
     
     $start_date = "$tahun-$bulan-01";
     $end_date = date('Y-m-t', strtotime($start_date));
     
     $stmt = $pdo->prepare("
-        SELECT id, created_at, nama_pelanggan, total, status 
+        SELECT id, created_at, nama_pelanggan, produk, total, status 
         FROM pesanan 
         WHERE status = 'selesai' 
         AND DATE(created_at) BETWEEN :start AND :end
@@ -46,10 +61,26 @@ if (isset($_GET['download']) && $_GET['download'] == 'csv') {
     
     $counter = 1;
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Format produk untuk CSV (satu baris, dipisah koma)
+        $items = json_decode($row['produk'], true);
+        $produk_str = '';
+        if (is_array($items)) {
+            $parts = [];
+            foreach ($items as $item) {
+                $nama = $item['nama'] ?? '–';
+                $qty = (int)($item['qty'] ?? 1);
+                $parts[] = "{$nama} ×{$qty}";
+            }
+            $produk_str = implode(', ', $parts);
+        } else {
+            $produk_str = $row['produk'];
+        }
+
         fputcsv($output, [
             $counter,
             date('d M Y H:i', strtotime($row['created_at'])),
             $row['nama_pelanggan'],
+            $produk_str, // <-- produk
             number_format($row['total'], 0, ',', '.'),
             $row['status']
         ]);
@@ -68,8 +99,8 @@ if (isset($_GET['download']) && $_GET['download'] == 'csv') {
         'end' => $end_date . ' 23:59:59'
     ]);
     $total = $stmt->fetchColumn();
-    
-    fputcsv($output, ['', '', 'TOTAL', number_format($total, 0, ',', '.'), '']);
+
+    fputcsv($output, ['', '', '', 'TOTAL', number_format($total, 0, ',', '.'), '']);
     fclose($output);
     exit;
 }
@@ -79,7 +110,7 @@ $start_date = "$tahun-$bulan-01";
 $end_date = date('Y-m-t', strtotime($start_date));
 
 $stmt = $pdo->prepare("
-    SELECT id, created_at, nama_pelanggan, total, status 
+    SELECT id, created_at, nama_pelanggan, produk, total, status 
     FROM pesanan 
     WHERE status = 'selesai' 
     AND DATE(created_at) BETWEEN :start AND :end
@@ -112,13 +143,14 @@ $total_pendapatan = (float)$stmt->fetchColumn();
     <title>Laporan Keuangan</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
     <style>
-        body { padding: 20px; background: #f5f7fa; }
-        .filter-container { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .container-fluid { margin: 0; padding: 0;}
+        body {background: #f5f7fa; }
+        .filter-container { background: white; padding: 15px;  margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .table-container { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .table th { background-color: #f8f9fa; font-weight: 600; }
-        .total-row { font-weight: bold; background-color: #e3f2fd !important; }
+        .table th { background-color: #DFBEE0; font-weight: 600;  }
+        .total-row { font-weight: bold; background-color: #DFBEE0 !important; }
         .download-btn {
-            background: linear-gradient(to right, #667eea 0%, #764ba2 100%);
+            background: #5A46A2;
             border: none;
             padding: 8px 20px;
             border-radius: 4px;
@@ -128,8 +160,12 @@ $total_pendapatan = (float)$stmt->fetchColumn();
         }
         .download-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 4px 12px #4a3a8a;
         }
+        .table-container {
+          padding: 15px;
+        }
+        
     </style>
 </head>
 <body>
@@ -158,7 +194,7 @@ $total_pendapatan = (float)$stmt->fetchColumn();
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
-                    <button type="submit" class="btn btn-primary w-100">
+                    <button type="submit" class="download-btn w-100">
                         <i class="mdi mdi-filter me-2"></i>Tampilkan
                     </button>
                 </div>
@@ -179,8 +215,8 @@ $total_pendapatan = (float)$stmt->fetchColumn();
                             <th class="text-center">No</th>
                             <th>Tanggal Pesanan</th>
                             <th>Nama Pelanggan</th>
+                            <th>Produk</th>
                             <th class="text-end">Total (Rp)</th>
-                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -197,17 +233,14 @@ $total_pendapatan = (float)$stmt->fetchColumn();
                                     <td class="text-center"><?= $counter++ ?></td>
                                     <td><?= date('d M Y H:i', strtotime($order['created_at'])) ?></td>
                                     <td><?= htmlspecialchars($order['nama_pelanggan']) ?></td>
+                                    <td><?= formatProduk($order['produk']) ?></td>
                                     <td class="text-end"><?= number_format($order['total'], 0, ',', '.') ?></td>
-                                    <td>
-                                        <span class="badge bg-success"><?= ucfirst($order['status']) ?></span>
-                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                             <!-- Total Row -->
                             <tr class="total-row">
-                                <td colspan="3" class="text-end fw-bold">TOTAL PENDAPATAN:</td>
+                                <td colspan="4" class="text-end fw-bold">TOTAL PENDAPATAN:</td>
                                 <td class="text-end fw-bold">Rp <?= number_format($total_pendapatan, 0, ',', '.') ?></td>
-                                <td></td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -225,3 +258,4 @@ $total_pendapatan = (float)$stmt->fetchColumn();
     </script>
 </body>
 </html>
+

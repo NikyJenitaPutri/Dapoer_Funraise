@@ -6,6 +6,17 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
+// Ambil data header
+$stmtHeader = $pdo->query("SELECT logo_path, business_name, tagline FROM header WHERE id = 1");
+$header = $stmtHeader->fetch(PDO::FETCH_ASSOC);
+if (!$header) {
+    $header = [
+        'logo_path' => 'assets/logo.png',
+        'business_name' => 'Dapoer Funraise',
+        'tagline' => 'Cemilan rumahan yang bikin nagih!'
+    ];
+}
+
 // Hapus item
 if (isset($_GET['remove'])) {
     $key = $_GET['remove'];
@@ -139,611 +150,538 @@ foreach ($cart as $item) {
     <title>Keranjang — Dapoer Funraise</title>
     <link rel="stylesheet" href="  https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css  ">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #5A46A2;
-            --secondary: #B64B62;
-            --accent: #F9CC22;
-            --bg-light: #FFF5EE;
-            --soft: #DFBEE0;
-            --text-muted: #9180BB;
-        }
+<style>
+    :root {
+        --primary: #5A46A2;
+        --secondary: #B64B62;
+        --accent: #F9CC22;
+        --bg-light: #FFF5EE;
+        --soft: #DFBEE0;
+        --text-muted: #9180BB;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
-        html, body {
-            height: 100%;
-            font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
-        }
+    html, body {
+        height: 100%;
+        font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+    }
 
-        body {
-            background: linear-gradient(135deg, var(--bg-light) 0%, #f9f5ff 100%);
-            color: #333;
-            display: flex;
-            flex-direction: column;
-        }
+    body {
+        background: linear-gradient(135deg, var(--bg-light) 0%, #f9f5ff 100%);
+        color: #333;
+    }
 
-        .app-header {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 1.2rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        .app-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            z-index: 1;
-        }
-        .app-header > * { position: relative; z-index: 2; }
+    /* 🔹 Wrapper utama: full viewport */
+    .app-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .logo:hover { transform: scale(1.02); }
-        .logo-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            backdrop-filter: blur(4px);
-        }
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-        .logo-main {
-            font-size: 1.75rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-        .logo-sub {
-            font-size: 0.95rem;
-            font-weight: 500;
-            opacity: 0.9;
-            margin-top: -2px;
-        }
+    /* 🔹 Header */
+    .app-header {
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        box-shadow: 0 4px 20px rgba(90, 70, 162, 0.25);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        backdrop-filter: blur(10px);
+        flex-shrink: 0;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    .app-header.hide {
+        transform: translateY(-100%);
+    }
+    .app-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        z-index: 1;
+    }
+    .app-header > * { position: relative; z-index: 2; }
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        text-decoration: none;
+    }
+    .logo:hover { transform: scale(1.02); }
 
-        .main-content {
-            flex: 1;
-            display: flex;
-            padding: 1rem;
-            overflow: auto;
-        }
+    .logo-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        backdrop-filter: blur(4px);
+    }
+    .logo-text { display: flex; flex-direction: column; }
+    .logo-main {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        color: white;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .logo-sub {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: rgba(255,255,255,0.92);
+        margin-top: -2px;
+    }
 
-        .content-wrapper {
-            background: white;
-            border-radius: 18px;
-            box-shadow: 0 12px 36px rgba(90, 70, 162, 0.18);
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(0,0,0,0.02);
-        }
+    /* 🔹 Konten utama */
+    .main-content {
+        flex: 1;
+        padding: 1rem;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
 
-        .page-header {
-            background: linear-gradient(120deg, #f8f6ff, #faf5ff);
-            color: var(--primary);
-            padding: 1.2rem 1.8rem;
-            font-size: 1.4rem;
-            font-weight: 700;
-            border-bottom: 1px solid #f0eaff;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .content-wrapper {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 28px rgba(90, 70, 162, 0.15);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.02);
+    }
 
-        .page-body {
-            flex: 1;
-            padding: 1.4rem;
-            overflow-y: auto;
-        }
+    .page-header {
+        background: linear-gradient(120deg, #faf8ff, #f9f5ff);
+        color: var(--primary);
+        padding: 0.8rem 1.3rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        border-bottom: 1px solid #f0eaff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
 
-        .alert {
-            background: #fff8f8;
-            color: #c0392b;
-            padding: 14px 18px;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid var(--secondary);
-            font-weight: 600;
-            font-size: 1.05rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 2px 5px rgba(182, 75, 98, 0.06);
-        }
+    .page-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.7rem;
+    }
 
-        .empty-state {
-            text-align: center;
-            padding: 2.5rem 1rem;
-            color: var(--text-muted);
-        }
-        .empty-icon { font-size: 3.8rem; margin-bottom: 1rem; color: var(--soft); }
-        .empty-title { font-size: 1.45rem; font-weight: 700; color: var(--primary); margin-bottom: 0.6rem; }
-        .empty-btn {
-            display: inline-flex; align-items: center; gap: 8px; margin-top: 1rem;
-            padding: 12px 26px; background: var(--primary); color: white;
-            border-radius: 12px; font-weight: 700; font-size: 1.15rem;
-            text-decoration: none;
-        }
+    /* 🔹 Alert */
+    .alert {
+        background: #fff8f8;
+        color: #c0392b;
+        padding: 10px 14px;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        border-left: 3px solid var(--secondary);
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        box-shadow: 0 1px 4px rgba(182, 75, 98, 0.06);
+    }
+    .alert ul { margin: 4px 0 0 18px; font-size: 0.9rem; }
 
+    /* 🔹 Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 1.8rem 1rem;
+        color: var(--text-muted);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 0.8rem; color: var(--soft); }
+    .empty-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.4rem;
+    }
+    .empty-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 0.8rem;
+        padding: 8px 20px;
+        background: var(--primary);
+        color: white;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        text-decoration: none;
+    }
+
+    /* 🔹 Layout 2 kolom */
+    .two-columns {
+        display: flex;
+        gap: 1rem;
+        height: 100%;
+    }
+
+    .column {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+
+    /* 🔹 Card section */
+    .section {
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        display: flex;
+        flex-direction: column;
+        border: 1px solid #f5f0ff;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .section-header {
+        background: linear-gradient(120deg, #faf8ff, #f8f5ff);
+        color: var(--primary);
+        padding: 0.7rem 1.1rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border-bottom: 1px solid #f0eaff;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    /* 🔹 Keranjang */
+    .cart-items {
+        padding: 0.8rem 0.8rem 0.6rem;
+        overflow-y: auto;
+        flex: 1;
+    }
+
+    .cart-item {
+        display: flex;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid #f8f5ff;
+    }
+    .cart-item:last-child { border-bottom: none; }
+
+    .item-img {
+        width: 64px;
+        height: 64px;
+        background: #fcfbff;
+        border-radius: 8px;
+        flex-shrink: 0;
+        border: 2px solid #f8f6ff;
+        overflow: hidden;
+    }
+    .item-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .item-img-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        font-size: 1.4rem;
+    }
+
+    .item-info { flex: 1; }
+    .item-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 2px;
+        line-height: 1.3;
+    }
+    .item-meta {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+        display: flex;
+        gap: 6px;
+    }
+    .item-price { font-weight: 700; color: var(--secondary); font-size: 1rem; }
+
+    .item-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        border: none;
+        background: #f0eaff;
+        color: var(--primary);
+        font-weight: 700;
+        font-size: 0.85rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .quantity-btn:hover { background: #e6d9ff; }
+    .quantity-input {
+        width: 50px;
+        padding: 4px 0;
+        border: none;
+        background: #faf9ff;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--primary);
+        text-align: center;
+        border-radius: 5px;
+    }
+    .remove-btn {
+        width: 30px;
+        height: 30px;
+        border: none;
+        background: #ffe8e8;
+        color: var(--secondary);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .remove-btn:hover {
+        background: #ffd5d5;
+        transform: scale(1.05);
+    }
+
+    /* 🔹 Form */
+    .checkout-form {
+        padding: 0.8rem;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 4px;
+        color: var(--primary);
+        font-size: 1.15rem;
+    }
+    .required { color: var(--secondary); }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 2px solid #e8e6f2;
+        border-radius: 8px;
+        font-size: 1.05rem;
+        line-height: 1.4;
+        transition: all 0.2s;
+        background: #faf9ff;
+        font-weight: 500;
+        font-family: inherit;
+    }
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(90, 70, 162, 0.2);
+        background: white;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        height: 120px;
+        resize: none;
+    }
+
+    .radio-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+    .radio-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border: 2px solid #f0eaff;
+        border-radius: 8px;
+        background: #faf8ff;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 1.05rem;
+    }
+    .radio-option:hover {
+        border-color: var(--primary);
+        background: #f5f2ff;
+    }
+    .radio-option input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--secondary);
+    }
+    .radio-label-text { font-weight: 600; color: #444; }
+    .radio-option input:checked + i + .radio-label-text {
+        color: var(--primary);
+    }
+    .radio-option i {
+        font-size: 1.1rem;
+        color: var(--primary);
+    }
+    .radio-option input:checked ~ i {
+        color: var(--secondary);
+    }
+
+    /* 🔹 HANYA SUBTOTAL — tidak ada total */
+    .cart-summary {
+        background: linear-gradient(135deg, #fbf9ff, #f7f3ff);
+        border-radius: 12px;
+        padding: 0.7rem 1rem;
+        margin-top: 0.8rem;
+        border: 1px solid #f0eaff;
+        flex-shrink: 0;
+    }
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    .summary-label { color: var(--text-muted); }
+    .summary-value { color: var(--secondary); font-weight: 700; }
+
+    /* 🔹 Tombol */
+    .form-footer {
+        margin-top: 0.8rem;
+        padding-top: 0.6rem;
+        border-top: 1px solid #f0eaff;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        flex-shrink: 0;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        text-decoration: none;
+        border: none;
+        transition: all 0.25s;
+        font-family: inherit;
+        flex: 1;
+    }
+    .btn-secondary {
+        background: linear-gradient(135deg, var(--soft), #c8a5d0);
+        color: var(--primary);
+    }
+    .btn-secondary:hover {
+        background: linear-gradient(135deg, #d0a8d5, #c095cb);
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--secondary), #9e3e52);
+        color: white;
+        box-shadow: 0 3px 10px rgba(182, 75, 98, 0.25);
+    }
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(182, 75, 98, 0.35);
+    }
+
+    /* 🔹 Form row */
+    .form-row {
+        display: flex;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+        margin-bottom: 0.9rem;
+    }
+    .form-row > div {
+        flex: 1;
+        min-width: 220px;
+    }
+
+    /* 🔹 Responsif */
+    @media (max-width: 899px) {
         .two-columns {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .column {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .section {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
-            margin-bottom: 1.2rem;
-            border: 1px solid #f5f0ff;
-        }
-        .section-header {
-            background: linear-gradient(120deg, #faf8ff, #f8f5ff);
-            color: var(--primary);
-            padding: 1rem 1.5rem;
-            font-weight: 700;
-            font-size: 1.25rem;
-            border-bottom: 1px solid #f0eaff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .cart-items {
-            padding: 1.2rem 1.2rem 0.6rem;
-        }
-
-        .cart-item {
-            display: flex;
-            gap: 14px;
-            padding: 12px 0;
-            border-bottom: 1px solid #f8f5ff;
-        }
-        .cart-item:last-child { border-bottom: none; }
-
-        .item-img {
-            width: 72px;
-            height: 72px;
-            background: #fcfbff;
-            border-radius: 10px;
-            flex-shrink: 0;
-            border: 2px solid #f8f6ff;
-            overflow: hidden;
-        }
-        .item-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .item-img-placeholder {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-            font-size: 1.6rem;
-        }
-        .item-info { flex: 1; }
-        .item-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 4px;
-            line-height: 1.3;
-        }
-        .item-meta {
-            font-size: 1.05rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-            display: flex;
-            gap: 8px;
-        }
-        .item-price { font-weight: 700; color: var(--secondary); font-size: 1.1rem; }
-
-        .item-controls {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-        .quantity-btn {
-            width: 34px;
-            height: 34px;
-            border: none;
-            background: #f0eaff;
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .quantity-btn:hover { background: #e6d9ff; }
-        .quantity-input {
-            width: 56px;
-            padding: 6px 0;
-            border: none;
-            background: #faf9ff;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--primary);
-            text-align: center;
-            border-radius: 6px;
-        }
-        .remove-btn {
-            width: 34px;
-            height: 34px;
-            border: none;
-            background: #ffe8e8;
-            color: var(--secondary);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .remove-btn:hover {
-            background: #ffd5d5;
-            transform: scale(1.05);
-        }
-
-        .checkout-form {
-            padding: 1.4rem 1.2rem;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 700;
-            margin-bottom: 6px;
-            color: var(--primary);
-            font-size: 1.25rem;
-        }
-        .required { color: var(--secondary); }
-
-        .form-control {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e8e6f2;
-            border-radius: 10px;
-            font-size: 1.15rem;
-            line-height: 1.4;
-            transition: all 0.25s;
-            background: #faf9ff;
-            font-weight: 500;
-            font-family: inherit;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.2);
-            background: white;
-        }
-        textarea.form-control {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .radio-group {
-            display: flex;
             flex-direction: column;
             gap: 0.6rem;
         }
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border: 2px solid #f0eaff;
-            border-radius: 10px;
-            background: #faf8ff;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .radio-option:hover {
-            border-color: var(--primary);
-            background: #f5f2ff;
-        }
-        .radio-option input {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--secondary);
-        }
-        .radio-label-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #444;
-        }
-        .radio-option input:checked + i + .radio-label-text {
-            color: var(--primary);
-        }
-        .radio-option i {
-            font-size: 1.2rem;
-            color: var(--primary);
-        }
-        .radio-option input:checked ~ i {
-            color: var(--secondary);
-        }
+        .column { gap: 0.6rem; }
+        .app-header { padding: 0.6rem 1rem; }
+        .logo-main { font-size: 1.3rem; }
+        .logo-icon { width: 38px; height: 38px; }
+    }
 
-        .cart-summary {
-            background: linear-gradient(135deg, #fbf9ff, #f7f3ff);
-            border-radius: 14px;
-            padding: 1rem 1.4rem;
-            margin-top: 1.4rem;
-            border: 1px solid #f0eaff;
-        }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-            font-size: 1.15rem;
-        }
-        .summary-label { color: var(--text-muted); }
-        .summary-total {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--secondary);
-            border-top: 2px solid var(--soft);
-            padding-top: 10px;
-            margin-top: 6px;
-        }
-
-        .form-footer {
-            margin-top: 1.4rem;
-            padding-top: 1rem;
-            border-top: 1px solid #f0eaff;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 22px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1.2rem;
-            cursor: pointer;
-            text-decoration: none;
-            border: none;
-            transition: all 0.3s;
-            font-family: inherit;
-        }
-        .btn-secondary {
-            background: linear-gradient(135deg, var(--soft), #c8a5d0);
-            color: var(--primary);
-            flex: 1;
-        }
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, #d0a8d5, #c095cb);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, var(--secondary), #9e3e52);
-            color: white;
-            flex: 1;
-            box-shadow: 0 4px 12px rgba(182, 75, 98, 0.25);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 16px rgba(182, 75, 98, 0.35);
-        }
-
-        .form-row {
-            display: flex;
-            gap: 1.2rem;
-            flex-wrap: wrap;
-            margin-bottom: 1.3rem;
-        }
-        .form-row > div {
-            flex: 1;
-            min-width: 240px;
-        }
-
-        /* 🔹 Media Queries — Responsif untuk Semua Layar */
-        @media (max-width: 899px) {
-            .two-columns {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .column {
-                min-width: auto;
-            }
-
-            .form-row {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .form-row > div {
-                min-width: auto;
-            }
-
-            .app-header {
-                padding: 1rem 1.2rem;
-            }
-
-            .logo {
-                gap: 10px;
-            }
-
-            .logo-icon {
-                width: 44px;
-                height: 44px;
-                font-size: 1.5rem;
-            }
-
-            .logo-main {
-                font-size: 1.45rem;
-            }
-
-            .logo-sub {
-                font-size: 0.85rem;
-            }
-
-            .page-header {
-                font-size: 1.25rem;
-                padding: 1rem 1.2rem;
-            }
-
-            .section-header {
-                font-size: 1.15rem;
-                padding: 0.8rem 1.2rem;
-            }
-
-            .cart-item {
-                gap: 10px;
-                padding: 10px 0;
-            }
-
-            .item-img {
-                width: 64px;
-                height: 64px;
-            }
-
-            .item-name {
-                font-size: 1.1rem;
-            }
-
-            .item-meta {
-                font-size: 0.95rem;
-            }
-
-            .quantity-input {
-                width: 50px;
-                padding: 5px 0;
-                font-size: 1rem;
-            }
-
-            .quantity-btn, .remove-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 0.9rem;
-            }
-
-            .form-label {
-                font-size: 1.15rem;
-            }
-
-            .btn {
-                padding: 10px 18px;
-                font-size: 1.1rem;
-            }
-
-            .form-footer {
-                flex-direction: column;
-                gap: 0.8rem;
-            }
-        }
-
-        @media (max-width: 599px) {
-            .app-header {
-                padding: 0.9rem 1rem;
-            }
-
-            .logo-main {
-                font-size: 1.3rem;
-            }
-
-            .logo-sub {
-                display: none;
-            }
-
-            .page-body {
-                padding: 1rem;
-            }
-
-            .section {
-                margin-bottom: 1rem;
-            }
-
-            .cart-items, .checkout-form {
-                padding: 1rem 1rem 0.5rem;
-            }
-
-            .cart-item {
-                flex-wrap: wrap;
-            }
-
-            .item-info {
-                flex-basis: calc(100% - 74px);
-            }
-
-            .item-controls {
-                width: 100%;
-                margin-top: 8px;
-                justify-content: flex-start;
-            }
-
-            .quantity-input {
-                width: 48px;
-            }
-
-            .summary-row, .summary-total {
-                font-size: 1rem;
-            }
-
-            .btn {
-                font-size: 1.05rem;
-                padding: 9px 16px;
-            }
-        }
-    </style>
+    @media (max-width: 599px) {
+        .app-header { padding: 0.55rem 0.8rem; }
+        .logo-main { font-size: 1.2rem; }
+        .logo-sub { display: none; }
+        .page-header { font-size: 1.15rem; padding: 0.7rem 1rem; }
+        .section-header { font-size: 1.05rem; padding: 0.6rem 1rem; }
+        .cart-item { gap: 8px; padding: 6px 0; }
+        .item-img { width: 60px; height: 60px; }
+        .item-name { font-size: 1.05rem; }
+        .form-label { font-size: 1.1rem; }
+        .form-control { font-size: 1rem; padding: 9px 12px; }
+        .btn { font-size: 1.05rem; padding: 7px 14px; }
+        .form-footer { gap: 6px; }
+    }
+    /* 🔹 Samakan tinggi dan lebar antara input nama dan textarea alamat */
+    /* 🔹 Pusatkan teks di input nama agar rapi */
+    #nama {
+        display: flex;
+        align-items: center;
+        padding-top: 0;
+        padding-bottom: 0;
+        line-height: 1.4;
+    }
+</style>
 </head>
 <body>
 
     <header class="app-header">
         <div class="logo">
             <div class="logo-icon">
-                <img src="assets/logo.png" alt="Logo Dapoer Funraise" style="width: 100%; height: 100%; object-fit: contain;">
+                <img src="<?= htmlspecialchars($header['logo_path']) ?>" alt="Logo <?= htmlspecialchars($header['business_name']) ?>" style="width: 100%; height: 100%; object-fit: contain;">
             </div>
             <div class="logo-text">
-                <div class="logo-main">Dapoer Funraise</div>
-                <div class="logo-sub">Keranjang Belanja</div>
+                <span class="logo-main"><?= htmlspecialchars($header['business_name']) ?></span>
+                <span class="logo-sub"><?= htmlspecialchars($header['tagline']) ?></span>
             </div>
         </div>
     </header>
 
     <main class="main-content">
-        <div class="content-wrapper">
-            <div class="page-header">
-                <i class="fas fa-shopping-cart" style="color: var(--secondary);"></i>
-                Keranjang & Detail Pemesanan
-            </div>
             <div class="page-body">
 
                 <?php if (!empty($errors)): ?>
@@ -861,7 +799,7 @@ foreach ($cart as $item) {
                                                     class="form-control"
                                                     value="<?= htmlspecialchars($_POST['nama'] ?? '') ?>" 
                                                     required 
-                                                    placeholder="Contoh: Siti Aisyah"
+                                                    style="min-height:120px; height:120px; resize:none;"
                                                 >
                                             </div>
                                             <div>
@@ -872,9 +810,8 @@ foreach ($cart as $item) {
                                                     id="alamat" 
                                                     name="alamat" 
                                                     class="form-control"
-                                                    rows="2"
                                                     required 
-                                                    placeholder="Jl. Melati No. 12, Bandung"
+                                                    style="min-height:120px; height:120px; resize:none;"
                                                 ><?= htmlspecialchars($_POST['alamat'] ?? '') ?></textarea>
                                             </div>
                                         </div>
@@ -928,10 +865,6 @@ foreach ($cart as $item) {
                                                 <span class="summary-label">Subtotal</span>
                                                 <span>Rp <?= number_format($total, 0, ',', '.') ?></span>
                                             </div>
-                                            <div class="summary-total">
-                                                <span>Total</span>
-                                                <span>Rp <?= number_format($total, 0, ',', '.') ?></span>
-                                            </div>
                                         </div>
 
                                         <div class="form-footer">
@@ -968,6 +901,32 @@ foreach ($cart as $item) {
             const form = document.getElementById('cartForm');
             if (form) form.submit();
         }
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('.app-header');
+            let lastScrollY = window.scrollY;
+            let ticking = false;
+
+            const updateHeader = () => {
+                if (window.scrollY > lastScrollY && window.scrollY > 80) {
+                    // Scroll turun → sembunyikan
+                    header.classList.add('hide');
+                } else {
+                    // Scroll naik / di atas → tampilkan
+                    header.classList.remove('hide');
+                }
+                lastScrollY = window.scrollY;
+                ticking = false;
+            };
+
+            const requestTick = () => {
+                if (!ticking) {
+                    requestAnimationFrame(updateHeader);
+                    ticking = true;
+                }
+            };
+
+            window.addEventListener('scroll', requestTick, { passive: true });
+        });  
     </script>
 </body>
 </html> 

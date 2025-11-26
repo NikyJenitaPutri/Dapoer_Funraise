@@ -33,8 +33,10 @@ $stmtPhotos = $pdo->query("
 $photos = $stmtPhotos->fetchAll(PDO::FETCH_ASSOC);
 
 $alert = '';
+$alertType = 'success';
 if (isset($_SESSION['tk_alert'])) {
     $alert = $_SESSION['tk_alert'];
+    $alertType = strpos($_SESSION['tk_alert'], 'Gagal') !== false ? 'error' : 'success';
     unset($_SESSION['tk_alert']);
 }
 ?>
@@ -44,365 +46,475 @@ if (isset($_SESSION['tk_alert'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tentang Kami — Admin</title>
+    <title>Tentang Kami — Dapoer Funraise</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #B64B62;
-            --secondary: #5A46A2;
+            --primary: #5A46A2;
+            --secondary: #B64B62;
             --accent: #F9CC22;
+            --soft: #DFBEE0;
+            --text-muted: #9180BB;
             --cream: #FFF5EE;
-            --dark: #2a1f3d;
-            --gray-btn: #6c757d;
-            --font-main: 'Poppins', sans-serif;
-            --transition: all 0.3s ease;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: var(--font-main);
-            background-color: #f9f7fc;
+            font-family: 'Poppins', sans-serif;
+            background: #f1e8fdff;
             color: #333;
-            padding: 20px;
+            font-size: 15px;
         }
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 6px 20px rgba(90, 70, 162, 0.1);
-            overflow: hidden;
-        }
-        header {
-            background: linear-gradient(90deg, var(--secondary), var(--primary));
-            color: white;
-            padding: 1rem 2rem;
+
+        .main-wrapper {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 0;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
         }
-        .header-title { font-size: 1.5rem; font-weight: 600; }
-        .header-title i { margin-right: 8px; }
-        .nav-actions a {
-            color: white;
-            background: rgba(255,255,255,0.2);
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-weight: 500;
-            transition: var(--transition);
-            text-decoration: none;
+
+        @media (max-width: 768px) {
+            .main-wrapper {
+                flex-direction: column;
+            }
         }
-        .nav-actions a:hover { background: rgba(255,255,255,0.3); }
-        .content { padding: 30px; }
-        .section-heading {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--dark);
-        }
-        .alert {
-            padding: 14px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            text-align: left;
-        }
-        .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
-        .alert-error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-        .form-row {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-        .form-col {
+
+        .form-box {
             flex: 1;
-            min-width: 300px;
+            background: white;
+            box-shadow: 0 5px 20px rgba(90, 70, 162, 0.1);
+            overflow: hidden;
+            border: 1px solid #f0eaff;
+            margin: 0;
+            border-radius: 0;
         }
+
+        .photos-box {
+            width: 380px;
+            flex-shrink: 0;
+            background: white;
+            box-shadow: 0 5px 20px rgba(90, 70, 162, 0.1);
+            overflow: hidden;
+            border: 1px solid #f0eaff;
+            margin: 0;
+            border-radius: 0;
+        }
+
+        @media (max-width: 768px) {
+            .photos-box {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        .form-header, .photos-header {
+            background: #faf5ff;
+            padding: 0.9rem 1.4rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-bottom: 1px solid #f0eaff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-header { color: var(--primary); }
+        .photos-header { color: var(--secondary); }
+
+        .form-body, .photos-body {
+            padding: 1.5rem 1.4rem;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        @media (min-width: 768px) {
+            .row {
+                flex-direction: row;
+                gap: 1.1rem;
+            }
+            .form-group {
+                flex: 1;
+            }
+        }
+
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 1rem;
         }
+
         .form-group label {
             display: block;
-            margin-bottom: 8px;
             font-weight: 600;
-            color: var(--dark);
-            font-size: 1.05rem;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            color: var(--primary);
         }
-        .form-control, .form-textarea {
+
+        input[type="text"], textarea {
             width: 100%;
-            padding: 12px 16px;
+            padding: 11px 15px;
+            border: 2px solid #e8e6f2;
             border-radius: 10px;
-            border: 2px solid #e0d6eb;
-            font-size: 1rem;
-            transition: var(--transition);
+            font-size: 0.93rem;
+            background: #faf9ff;
+            font-family: inherit;
+            transition: all 0.2s;
         }
-        .form-control:focus,
-        .form-textarea:focus {
+
+        input[type="text"]:focus,
+        textarea:focus {
             outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.2);
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.1);
         }
-        .form-textarea {
-            min-height: 180px;
+
+        textarea {
+            min-height: 100px;
             resize: vertical;
         }
-        .photos-heading {
-            font-size: 1.5rem;
-            margin: 30px 0 16px;
-            color: var(--dark);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .photos-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 16px;
-        }
-        .photo-card {
-            background: white;
-            border: 2px solid #e6e1f0;
-            border-radius: 14px;
-            overflow: hidden;
-            transition: var(--transition);
-        }
-        .photo-card:hover {
-            box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-            transform: translateY(-4px);
-        }
-        .photo-preview {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            background: #f5f5f5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-        }
-        .photo-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .photo-info {
-            padding: 16px;
-        }
-        .photo-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        .photo-sort {
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 0.95rem;
-        }
-        .photo-status {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .status-active { background: #d1fae5; color: #065f46; }
-        .status-inactive { background: #fee2e2; color: #b91c1c; }
-        .photo-alt {
+
+        .alert {
+            background: #fff8f8;
+            color: #c0392b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--secondary);
             font-size: 0.9rem;
-            color: #555;
-            margin: 4px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .photo-actions {
             display: flex;
-            gap: 8px;
-            margin-top: 12px;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 7px;
         }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 3px solid #66bb6a;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
-            padding: 8px 14px;
+            padding: 9px 18px;
             border-radius: 10px;
             font-weight: 600;
             font-size: 0.92rem;
             cursor: pointer;
-            transition: var(--transition);
-            border: none;
             text-decoration: none;
-            text-align: center;
+            border: none;
+            transition: all 0.15s;
+            font-family: inherit;
+            min-height: 40px;
         }
-        .btn-sm { padding: 6px 12px; font-size: 0.875rem; }
+
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #d05876);
+            background: linear-gradient(135deg, var(--secondary), #9e3e52);
             color: white;
+            flex: 1;
+            box-shadow: 0 2px 8px rgba(182, 75, 98, 0.2);
         }
+
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(182, 75, 98, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(182, 75, 98, 0.25);
         }
-        .btn-gray {
-            background: var(--gray-btn);
-            color: white;
+
+        .btn-secondary, .btn-gray {
+            background: linear-gradient(135deg, var(--soft), #c8a5d0);
+            color: var(--primary);
+            flex: 1;
         }
-        .btn-gray:hover { background: #5a6268; }
+
+        .btn-secondary:hover, .btn-gray:hover {
+            background: linear-gradient(135deg, #d0a8d5, #c095cb);
+        }
+
         .btn-outline {
             background: transparent;
-            border: 1px solid var(--primary);
             color: var(--primary);
+            border: 1px solid #e8e6f2;
         }
+
         .btn-outline:hover {
-            background: var(--primary);
-            color: white;
+            background: #faf9ff;
+            border-color: var(--primary);
         }
-        .btn-success { background: #28a745; color: white; }
-        .btn-success:hover { background: #218838; }
-        .btn-warning { background: #ffc107; color: #212529; }
-        .btn-warning:hover { background: #e0a800; }
-        .btn-danger { background: #dc3545; color: white; }
-        .btn-danger:hover { background: #c82333; }
+
+        .btn-danger {
+            background: #f9d9d9;
+            color: #d32f2f;
+            border: 1px solid #f1b7b7;
+        }
+
+        .btn-danger:hover {
+            background: #f5baba;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            min-height: auto;
+        }
+
+        .action-bar {
+            padding: 0.8rem 1.4rem 0.9rem;
+            background: #fbf9ff;
+            border-top: 1px solid #f3f0ff;
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            .action-bar {
+                flex-direction: column;
+            }
+        }
+
+        /* Photo Card — adapted from step-card */
+        .photo-card {
+            background: #faf9ff;
+            border: 1px solid #f0eaff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .photo-thumb {
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-thumb .placeholder {
+            color: #ccc;
+            font-size: 1.2rem;
+        }
+
+        .photo-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .photo-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 0.83rem;
+        }
+
+        .photo-sort { font-weight: 600; color: var(--primary); }
+        .photo-status { font-weight: 500; }
+        .status-active { color: #2e7d32; }
+        .status-inactive { color: var(--text-muted); }
+
+        .photo-alt {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 4px;
+            font-size: 0.92rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .photo-desc {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .photo-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
         .no-photos {
             text-align: center;
-            padding: 40px 20px;
-            color: #777;
-            background: var(--cream);
-            border-radius: 14px;
+            padding: 30px 10px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
-        .no-photos i { font-size: 2.5rem; margin-bottom: 16px; color: #ccc; }
-        @media (max-width: 768px) {
-            .form-row { flex-direction: column; }
-            .photos-list { grid-template-columns: 1fr; }
+
+        .no-photos i {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            color: #dcd6f7;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-title">
-                <i class="fas fa-info-circle"></i> Tentang Kami
+    <div class="main-wrapper">
+        <!-- Kiri: Form Judul, Subjudul & Konten -->
+        <div class="form-box">
+            <div class="form-header">
+                <i class="fas fa-info-circle" style="color: var(--secondary);"></i>
+                Konten "Tentang Kami"
             </div>
-            <div class="nav-actions">
-                <a href="index.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            </div>
-        </header>
 
-        <div class="content">
-            <h2 class="section-heading">Kelola Konten "Tentang Kami"</h2>
+            <div class="form-body">
+                <?php if ($alert): ?>
+                    <div class="alert <?= $alertType === 'success' ? 'alert-success' : '' ?>">
+                        <i class="fas fa-<?= $alertType === 'success' ? 'check-circle' : 'exclamation-circle' ?>"></i>
+                        <?= htmlspecialchars($alert) ?>
+                    </div>
+                <?php endif; ?>
 
-            <?php if ($alert): ?>
-                <div class="alert <?= strpos($alert, 'Gagal') !== false ? 'alert-error' : 'alert-success' ?>">
-                    <?= htmlspecialchars($alert) ?>
-                </div>
-            <?php endif; ?>
-
-            <form action="update_tentang_kami.php" method="POST">
-                <div class="form-row">
-                    <div class="form-col">
+                <form action="update_tentang_kami.php" method="POST">
+                    <div class="row">
                         <div class="form-group">
                             <label for="title">Judul</label>
-                            <input type="text" id="title" name="title" class="form-control"
-                                   value="<?= htmlspecialchars($tentang['title']) ?>" required>
+                            <input 
+                                type="text" 
+                                id="title" 
+                                name="title"
+                                value="<?= htmlspecialchars($tentang['title']) ?>"
+                                required
+                                placeholder="Contoh: Tentang Kami"
+                            >
                         </div>
+
                         <div class="form-group">
                             <label for="subtitle">Subjudul</label>
-                            <input type="text" id="subtitle" name="subtitle" class="form-control"
-                                   value="<?= htmlspecialchars($tentang['subtitle']) ?>" required>
+                            <input 
+                                type="text" 
+                                id="subtitle" 
+                                name="subtitle"
+                                value="<?= htmlspecialchars($tentang['subtitle']) ?>"
+                                required
+                                placeholder="Contoh: Dapur kecil, dampak besar..."
+                            >
                         </div>
                     </div>
-                    <div class="form-col">
-                        <div class="form-group">
-                            <label for="content">Konten (HTML diperbolehkan)</label>
-                            <textarea id="content" name="content" class="form-textarea" required><?= htmlspecialchars($tentang['content']) ?></textarea>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="form-actions">
-                    <button type="submit" name="update_tentang" class="btn btn-primary">
+                    <div class="form-group">
+                        <label for="content">Konten (HTML diperbolehkan)</label>
+                        <textarea 
+                            id="content" 
+                            name="content"
+                            required
+                            placeholder="Masukkan konten HTML..."><?= htmlspecialchars($tentang['content']) ?></textarea>
+                    </div>
+
+                    <button type="submit" name="update_tentang" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">
                         <i class="fas fa-save"></i> Simpan Konten
                     </button>
-                </div>
-            </form>
+                </form>
+            </div>
 
-            <h3 class="photos-heading">
-                <i class="fas fa-images"></i> Foto Carousel (<?= count($photos) ?> foto)
-            </h3>
+            <!-- Action bar: Kembali + Tambah Foto -->
+            <div class="action-bar">
+                <a href="../pengaturan.php" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Kembali
+                </a>
+                <a href="add-photo.php" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Tambah Foto
+                </a>
+            </div>
+        </div>
 
-            <?php if ($photos): ?>
-                <div class="photos-list">
+        <!-- Kanan: Daftar Foto Carousel -->
+        <div class="photos-box">
+            <div class="photos-header">
+                <i class="fas fa-images"></i>
+                Foto Carousel (<?= count($photos) ?> item)
+            </div>
+
+            <div class="photos-body">
+                <?php if ($photos): ?>
                     <?php foreach ($photos as $p): ?>
                         <div class="photo-card">
-                            <div class="photo-preview">
+                            <div class="photo-thumb">
                                 <?php if (file_exists('../' . $p['image_path'])): ?>
-                                    <img src="../<?= htmlspecialchars($p['image_path']) ?>" 
-                                         alt="<?= htmlspecialchars($p['alt_text']) ?>">
+                                    <img src="../<?= htmlspecialchars($p['image_path']) ?>" alt="<?= htmlspecialchars($p['alt_text']) ?>">
                                 <?php else: ?>
-                                    <i class="fas fa-ban" style="font-size: 2rem; color: #ccc;"></i>
+                                    <i class="fas fa-ban placeholder"></i>
                                 <?php endif; ?>
                             </div>
                             <div class="photo-info">
                                 <div class="photo-meta">
-                                    <span class="photo-sort">Urutan: <?= $p['sort_order'] ?></span>
+                                    <span class="photo-sort">Urutan: <?= (int)$p['sort_order'] ?></span>
                                     <span class="photo-status <?= $p['is_active'] ? 'status-active' : 'status-inactive' ?>">
                                         <?= $p['is_active'] ? 'Aktif' : 'Nonaktif' ?>
                                     </span>
                                 </div>
-                                <div class="photo-alt">
-                                    <strong>Alt:</strong> <?= htmlspecialchars($p['alt_text'] ?: '-') ?>
-                                </div>
                                 <div class="photo-actions">
                                     <a href="edit-photo.php?id=<?= $p['id'] ?>" class="btn btn-outline btn-sm">
-                                        <i class="fas fa-edit"></i> Edit
+                                        <i class="fas fa-edit"></i>
                                     </a>
                                     <?php if ($p['is_active']): ?>
-                                        <form method="POST" action="toggle-photo.php" style="display: inline;" 
+                                        <form method="POST" action="toggle-photo.php" style="display:inline;"
                                               onsubmit="return confirm('Nonaktifkan foto ini? Tidak tampil di halaman utama.')">
                                             <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                             <input type="hidden" name="action" value="deactivate">
-                                            <button type="submit" class="btn btn-warning btn-sm">
-                                                <i class="fas fa-eye-slash"></i> Nonaktifkan
+                                            <button type="submit" class="btn btn-gray btn-sm">
+                                                <i class="fas fa-eye-slash"></i>
                                             </button>
                                         </form>
                                     <?php else: ?>
-                                        <form method="POST" action="toggle-photo.php" style="display: inline;">
+                                        <form method="POST" action="toggle-photo.php" style="display:inline;">
                                             <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                             <input type="hidden" name="action" value="activate">
-                                            <button type="submit" class="btn btn-success btn-sm">
-                                                <i class="fas fa-eye"></i> Aktifkan
+                                            <button type="submit" class="btn btn-gray btn-sm">
+                                                <i class="fas fa-eye"></i>
                                             </button>
                                         </form>
                                     <?php endif; ?>
-                                    <form method="POST" action="delete-photo.php" style="display: inline;"
+                                    <form method="POST" action="delete-photo.php" style="display:inline;"
                                           onsubmit="return confirm('Hapus foto ini? File akan dihapus dari server.')">
                                         <input type="hidden" name="id" value="<?= $p['id'] ?>">
                                         <button type="submit" class="btn btn-danger btn-sm">
-                                            <i class="fas fa-trash"></i> Hapus
+                                            <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
                                 </div>
                             </div>
                         </div>
                     <?php endforeach; ?>
-                </div>
-            <?php else: ?>
-                <div class="no-photos">
-                    <i class="fas fa-images"></i>
-                    <p>Belum ada foto. Tambahkan foto pertama untuk carousel.</p>
-                </div>
-            <?php endif; ?>
-
-            <div style="margin-top: 30px; text-align: center;">
-                <a href="add-photo.php" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Tambah Foto Baru
-                </a>
-                <a href="index.php" class="btn btn-gray">
-                    <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
-                </a>
+                <?php else: ?>
+                    <div class="no-photos">
+                        <i class="fas fa-images"></i>
+                        <p>Belum ada foto carousel.</p>
+                        <a href="add-photo.php" class="btn btn-primary" style="margin-top:12px; width:100%;">
+                            <i class="fas fa-plus"></i> Tambah Foto
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>

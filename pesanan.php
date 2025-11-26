@@ -9,27 +9,23 @@ $error = $success = '';
 // --- Pencarian: satu field (ID atau Nama) ---
 $q = trim($_GET['q'] ?? '');
 $status_filter = trim($_GET['status'] ?? '');
-$page = max(1, (int)($_GET['page'] ?? 1)); // Halaman saat ini
-$per_page = 6; // Maksimal 6 order card per halaman
+$page = max(1, (int)($_GET['page'] ?? 1));
+$per_page = 3;
 $offset = ($page - 1) * $per_page;
 
 $where = "1=1";
 $params = [];
 
-// Filter berdasarkan status
 if ($status_filter !== '' && in_array($status_filter, ['baru', 'diproses', 'selesai', 'batal'])) {
     $where .= " AND status = ?";
     $params[] = $status_filter;
 }
 
-// Filter berdasarkan pencarian
 if ($q !== '') {
     if (ctype_digit($q)) {
-        // Jika semua karakter angka → cari berdasarkan ID
         $where .= " AND id = ?";
         $params[] = (int)$q;
     } else {
-        // Jika ada huruf → cari berdasarkan nama (case-insensitive)
         $where .= " AND LOWER(nama_pelanggan) LIKE ?";
         $params[] = '%' . strtolower($q) . '%';
     }
@@ -77,28 +73,24 @@ if (isset($_GET['hapus'])) {
     }
 }
 
-// --- Ambil data pesanan dengan filter ---
+// --- Ambil data ---
 try {
-    // Query untuk hitung total data (untuk pagination)
     $sql_count = "SELECT COUNT(*) FROM pesanan WHERE $where";
     $stmt_count = $pdo->prepare($sql_count);
     $stmt_count->execute($params);
     $total_orders = (int)$stmt_count->fetchColumn();
     $total_pages = max(1, ceil($total_orders / $per_page));
     
-    // Query untuk data yang ditampilkan (dengan filter + pagination)
     $sql = "SELECT id, nama_pelanggan, alamat, produk, total, pengambilan, metode_bayar, status, created_at
             FROM pesanan WHERE $where ORDER BY created_at DESC LIMIT $per_page OFFSET $offset";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-    // Query untuk statistik (tanpa filter, semua data)
     $stmt_all = $pdo->prepare("SELECT status FROM pesanan");
     $stmt_all->execute();
     $all_orders = $stmt_all->fetchAll(PDO::FETCH_ASSOC);
     
-    // Hitung jumlah per status dari semua data
     $count_baru = count(array_filter($all_orders, fn($o) => $o['status'] === 'baru'));
     $count_diproses = count(array_filter($all_orders, fn($o) => $o['status'] === 'diproses'));
     $count_selesai = count(array_filter($all_orders, fn($o) => $o['status'] === 'selesai'));
@@ -113,7 +105,6 @@ try {
     $count_baru = $count_diproses = $count_selesai = $count_batal = 0;
 }
 
-// Render produk: satu per baris (tidak digabung)
 function renderProduk($produkJson) {
     $data = json_decode($produkJson, true);
     if (!is_array($data)) return '<div class="produk-item">[Data produk tidak valid]</div>';
@@ -122,27 +113,14 @@ function renderProduk($produkJson) {
     foreach ($data as $item) {
         $qty = (int)($item['qty'] ?? 0);
         if ($qty <= 0) continue;
-        
         $nama = htmlspecialchars($item['nama'] ?? '—');
         $varian = htmlspecialchars($item['varian'] ?? '');
         $text = $nama;
-        if ($varian) {
-            $text .= " <span class=\"varian\">($varian)</span>";
-        }
-        
+        if ($varian) $text .= " <span class=\"varian\">($varian)</span>";
         $items[] = "<div class=\"produk-item\">• $text × <strong>$qty</strong></div>";
     }
-    
     return $items ? implode("\n", $items) : '<div class="produk-item">—</div>';
 }
-
-// Array untuk icon status
-$statusIcons = [
-    'baru' => 'clock',
-    'diproses' => 'sync-alt',
-    'selesai' => 'check-circle',
-    'batal' => 'ban'
-];
 ?>
 
 <!DOCTYPE html>
@@ -157,14 +135,14 @@ $statusIcons = [
         :root {
             --primary: #5A46A2;
             --secondary: #B64B62;
-            --bg: #f0ecfa;
+            --bg: #f5f3fb;
             --card: #ffffff;
             --text: #333333;
             --border-light: #eae6ff;
             --border-medium: #d8d2f0;
             --border-card: #c9c1e8;
-            --shadow: 0 6px 16px rgba(90, 70, 162, 0.12);
-            --shadow-hover: 0 8px 24px rgba(90, 70, 162, 0.2);
+            --shadow: 0 4px 10px rgba(90, 70, 162, 0.08);
+            --shadow-hover: 0 6px 14px rgba(90, 70, 162, 0.15);
         }
 
         * {
@@ -177,130 +155,128 @@ $statusIcons = [
             font-family: 'Poppins', sans-serif;
             background: var(--bg);
             color: var(--text);
-            padding: 1rem;
-            line-height: 1.5;
+            padding: 0rem;
+            line-height: 1.4;
+            font-size: 14px;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 0 0.5rem;
+            padding: 0 0rem;
         }
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 1rem;
         }
 
         .stat-card {
             background: var(--card);
-            padding: 1.1rem;
-            border-radius: 12px;
+            padding: 0.9rem;
+            border-radius: 10px;
             box-shadow: var(--shadow);
             text-align: center;
             border: 1px solid var(--border-card);
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
             cursor: pointer;
             position: relative;
         }
 
         .stat-card:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
         }
 
         .stat-card.active {
             border-color: var(--primary);
-            background: linear-gradient(135deg, rgba(90, 70, 162, 0.1), rgba(182, 75, 98, 0.1));
+            background: rgba(90, 70, 162, 0.03);
         }
 
         .stat-card.active::after {
             content: '✓';
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 6px;
+            right: 6px;
             background: var(--primary);
             color: white;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
         }
 
         .stat-value {
-            font-size: 1.9rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
             line-height: 1.1;
         }
 
         .stat-label {
-            font-size: 0.95rem;
-            font-weight: 600;
-            margin-top: 0.25rem;
-            color: #555;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-top: 0.2rem;
+            color: #666;
         }
 
         .search-bar {
             background: var(--card);
-            padding: 1.2rem;
-            border-radius: 14px;
+            padding: 0.8rem;
+            border-radius: 12px;
             box-shadow: var(--shadow);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             display: flex;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 0.6rem;
             align-items: flex-end;
             border: 1px solid var(--border-card);
         }
 
         .search-group {
             flex: 1;
-            min-width: 250px;
+            min-width: 200px;
         }
 
         .search-group label {
             display: block;
-            font-size: 0.9rem;
+            font-size: 0.78rem;
             font-weight: 600;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.3rem;
             color: var(--primary);
         }
 
         .search-group input {
             width: 100%;
-            padding: 0.65rem 1rem;
+            padding: 0.5rem 0.8rem;
             border: 1px solid var(--border-medium);
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-family: inherit;
-            transition: all 0.3s ease;
+            transition: all 0.25s ease;
         }
 
         .search-group input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.15);
+            box-shadow: 0 0 0 3px rgba(90, 70, 162, 0.12);
         }
 
         .btn-search,
         .btn-reset {
-            padding: 0.65rem 1.4rem;
+            padding: 0.5rem 1rem;
             border: none;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
         }
 
         .btn-search {
@@ -323,303 +299,257 @@ $statusIcons = [
         }
 
         .alert {
-            padding: 0.8rem 1.2rem;
+            padding: 0.6rem 1rem;
             border-radius: 8px;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             font-weight: 600;
+            font-size: 0.9rem;
         }
 
-        .alert-success {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #c8e6c9;
-        }
+        .alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .alert-error { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
 
-        .alert-error {
-            background: #ffebee;
-            color: #c62828;
-            border: 1px solid #ffcdd2;
-        }
-
-        /* 🎯 UBAH MENJADI 3 KOLOM */
+        /* 🎯 3 CARD PER BARIS — GRID, TANPA SCROLL HORIZONTAL */
         .orders-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.4rem;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 0.9rem;
+            padding: 0.8rem 0;
+            margin: 0;
         }
 
         .order-card {
             background: var(--card);
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            transition: all 0.3s ease;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(90, 70, 162, 0.07);
             border: 1px solid var(--border-card);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
+            transition: all 0.2s ease;
         }
 
         .order-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             box-shadow: var(--shadow-hover);
             border-color: var(--primary);
         }
 
         .order-head {
             background: #fbf9ff;
-            padding: 0.9rem 1.1rem;
+            padding: 0.6rem 0.8rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-medium);
-            flex-wrap: wrap;
-            gap: 0.4rem;
+            font-size: 0.82rem;
         }
 
-        .order-id {
-            font-weight: 700;
-            font-size: 1.1rem;
-            color: var(--primary);
-        }
-
-        .order-time {
-            font-size: 0.8rem;
-            color: #777;
-        }
+        .order-id { font-weight: 700; color: var(--primary); }
+        .order-time { color: #888; }
 
         .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            white-space: nowrap;
-            border: 1px solid transparent;
             display: inline-flex;
             align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 14px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            white-space: nowrap;
         }
-
-        .status-baru { background: #e3f2fd; color: #1565c0; border-color: #bbdefb; }
-        .status-diproses { background: #fff8e1; color: #ef6c00; border-color: #ffe082; }
-        .status-selesai { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
-        .status-batal { background: #ffebee; color: #c62828; border-color: #ffcdd2; }
+        .status-badge i { font-size: 0.7rem; }
+        .status-baru { background: #e3f2fd; color: #1565c0; }
+        .status-diproses { background: #fff8e1; color: #ef6c00; }
+        .status-selesai { background: #e8f5e9; color: #2e7d32; }
+        .status-batal { background: #ffebee; color: #c62828; }
 
         .order-body {
-            padding: 1rem;
-            font-size: 0.92rem;
+            padding: 0.7rem;
+            font-size: 0.8rem;
             flex: 1;
         }
 
         .customer-name {
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             color: var(--primary);
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.2rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .customer-addr {
             color: #555;
-            line-height: 1.4;
-            margin-bottom: 0.8rem;
-            font-size: 0.88rem;
+            line-height: 1.35;
+            margin-bottom: 0.5rem;
+            font-size: 0.76rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .produk-list {
             background: #fcfbff;
-            padding: 0.8rem;
-            border-radius: 8px;
-            margin-bottom: 0.8rem;
-            font-size: 0.9rem;
-            border: 1px solid #f0ecfa;
+            padding: 0.5rem;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            border: 1px solid var(--border-light);
+            max-height: 60px;
+            overflow-y: auto;
         }
 
-        .produk-item {
-            margin-bottom: 0.3rem;
-            line-height: 1.4;
-            color: #333;
-        }
-
-        .produk-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .varian {
-            color: #777;
-            font-weight: normal;
-            opacity: 0.9;
-        }
+        .produk-item { margin-bottom: 0.2rem; line-height: 1.3; color: #333; }
+        .produk-item:last-child { margin-bottom: 0; }
+        .varian { color: #777; font-weight: normal; opacity: 0.9; }
 
         .meta-row {
             display: flex;
             justify-content: space-between;
-            margin: 0.3rem 0;
-            font-size: 0.88rem;
+            margin: 0.2rem 0;
+            font-size: 0.76rem;
         }
 
         .total {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--secondary);
             text-align: right;
-            margin-top: 0.6rem;
-            padding-top: 0.5rem;
+            margin-top: 0.4rem;
+            padding-top: 0.3rem;
             border-top: 1px solid var(--border-medium);
         }
 
+        /* 🔹 Tombol ikon kecil */
         .order-footer {
-            padding: 0.8rem 1rem;
+            padding: 0.4rem 0.6rem;
             background: #fbf9ff;
             display: flex;
             justify-content: flex-end;
-            gap: 0.6rem;
-            flex-wrap: wrap;
+            gap: 0.3rem;
             border-top: 1px solid var(--border-medium);
         }
 
-        .btn {
-            padding: 6px 12px;
+        .status-update-group {
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .status-select {
+            padding: 4px 8px 4px 24px !important;
+            font-size: 0.75rem !important;
+            border-radius: 5px !important;
+            border: 1px solid var(--border-medium) !important;
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235A46A2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat 6px center;
+            background-size: 12px;
+            appearance: none;
+            min-width: 90px;
+            height: 28px;
+        }
+
+        .btn-icon {
+            width: 28px;
+            height: 28px;
             border-radius: 6px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 5px;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-
-        .btn-update { background: #e8eaff; color: var(--primary); border: 1px solid #d0c9f0; }
-        .btn-update:hover { background: #dde5ff; }
-        .btn-delete { background: #ffe8e8; color: var(--secondary); border: 1px solid #ffcdd2; }
-        .btn-delete:hover { background: #ffd8d8; }
-
-        select {
-            padding: 5px 9px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background: white;
-            font-size: 0.85rem;
-            font-family: inherit;
+            justify-content: center;
+            border: 1px solid;
             cursor: pointer;
+            transition: all 0.2s;
+            padding: 0;
+            font-size: 0.75rem;
         }
+        .btn-icon i { font-size: 0.7rem; }
+        .btn-icon:hover { transform: translateY(-1px); }
+
+        .btn-icon {
+            background: #e8eaff;
+            color: var(--primary);
+            border-color: #d0c9f0;
+        }
+        .btn-icon:hover { background: #dde5ff; }
+
+        .btn-danger {
+            background: #ffe8e8;
+            color: var(--secondary);
+            border-color: #ffcdd2;
+        }
+        .btn-danger:hover { background: #ffd8d8; }
 
         .empty {
-            grid-column: 1 / -1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            padding: 3rem 1.5rem;
+            padding: 2rem 1rem;
             color: #777;
             background: var(--card);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px dashed var(--border-medium);
+            min-width: 280px;
+            flex: 0 0 auto;
         }
+        .empty i { font-size: 2.4rem; color: #ddd; margin-bottom: 0.6rem; }
+        .empty h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.3rem; color: #555; }
 
-        .empty i {
-            font-size: 3.2rem;
-            color: #ddd;
-            margin-bottom: 1rem;
-        }
-
-        .empty h3 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #555;
-        }
-
-        /* 📱 RESPONSIVE: Tablet → 2 kolom */
-        @media (max-width: 1024px) {
-            .orders-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        /* 📱 RESPONSIVE: Mobile → 1 kolom */
         @media (max-width: 768px) {
-            .search-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .orders-grid {
-                grid-template-columns: 1fr;
-            }
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            body {
-                padding: 0.8rem;
-            }
+            .orders-grid { flex-direction: column; overflow-x: hidden; gap: 0.8rem; }
+            .order-card, .empty { width: 100%; }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            body { padding: 0.6rem; }
         }
 
         @media (max-width: 480px) {
-            .btn-search,
-            .btn-reset {
-                flex: 1;
-                justify-content: center;
-            }
-            .order-footer {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .order-footer form,
-            .order-footer a {
-                width: 100%;
-                justify-content: center;
-            }
-            .stats {
-                grid-template-columns: 1fr;
-            }
+            .stats { grid-template-columns: 1fr; }
+            .order-footer { flex-direction: column; align-items: stretch; }
+            .order-footer > * { width: 100%; justify-content: center; }
         }
 
-        /* 📄 PAGINATION */
         .pagination {
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 0.5rem;
-            margin-top: 2rem;
+            gap: 0.4rem;
+            margin-top: 1.5rem;
             flex-wrap: wrap;
         }
 
         .pagination a,
         .pagination span {
-            padding: 0.6rem 1rem;
+            padding: 0.5rem 0.8rem;
             border: 1px solid var(--border-medium);
-            border-radius: 8px;
+            border-radius: 6px;
             text-decoration: none;
             color: var(--text);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             transition: all 0.2s;
             background: var(--card);
-            min-width: 40px;
+            min-width: 34px;
             text-align: center;
         }
 
         .pagination a:hover {
             background: var(--primary);
             color: white;
-            border-color: var(--primary);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
         }
 
         .pagination .active {
             background: var(--primary);
             color: white;
-            border-color: var(--primary);
-            cursor: default;
-        }
-
-        .pagination .disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            pointer-events: none;
         }
 
         .pagination-info {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 0.8rem;
             color: #777;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
     </style>
 </head>
@@ -645,23 +575,23 @@ $statusIcons = [
         </div>
     </div>
 
-    <!-- Pencarian: SATU FIELD SAJA -->
-    <div class="search-bar">
+    <form method="GET" class="search-bar">
         <div class="search-group">
             <label for="search">Cari Pesanan (ID atau Nama)</label>
             <input type="text" id="search" name="q"
-                   value="<?= htmlspecialchars($q) ?>"
-                   placeholder="Contoh: 123 atau Budi">
+                value="<?= htmlspecialchars($q) ?>"
+                placeholder="Contoh: 123 atau Budi"
+                autocomplete="off">
         </div>
-        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;min-width:200px;">
-            <button type="button" class="btn-search" onclick="submitSearch()">
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;min-width:180px;">
+            <button type="submit" class="btn-search">
                 <i class="fas fa-search"></i> Cari
             </button>
-            <button type="button" class="btn-reset" onclick="resetAll()">
-                <i class="fas fa-undo"></i> Reset Semua
-            </button>
+            <a href="pesanan.php" class="btn-reset">
+                <i class="fas fa-undo"></i> Reset
+            </a>
         </div>
-    </div>
+    </form>
 
     <?php if ($success): ?>
         <div class="alert alert-success">
@@ -679,7 +609,7 @@ $statusIcons = [
             <div class="empty">
                 <i class="fas fa-inbox"></i>
                 <h3>Belum Ada Pesanan</h3>
-                <p>Pesanan akan muncul setelah pelanggan melakukan checkout.</p>
+                <p>Pesanan akan muncul setelah checkout.</p>
             </div>
         <?php else: ?>
             <?php foreach ($orders as $o): ?>
@@ -690,13 +620,19 @@ $statusIcons = [
                             <div class="order-time"><?= date('d M Y • H:i', strtotime($o['created_at'])) ?></div>
                         </div>
                         <span class="status-badge status-<?= htmlspecialchars($o['status']) ?>">
-                            <i class="fas fa-<?= $statusIcons[$o['status']] ?? 'question-circle' ?>"></i>
-                            <?= [
-                                'baru' => 'Baru',
-                                'diproses' => 'Diproses',
-                                'selesai' => 'Selesai',
-                                'batal' => 'Dibatalkan'
-                            ][$o['status']] ?? ucfirst($o['status']) ?>
+                            <?php
+                            $statusMap = [
+                                'baru' => ['icon' => 'clock', 'text' => 'Baru'],
+                                'diproses' => ['icon' => 'sync-alt', 'text' => 'Diproses'],
+                                'selesai' => ['icon' => 'check-circle', 'text' => 'Selesai'],
+                                'batal' => ['icon' => 'times-circle', 'text' => 'Dibatalkan']
+                            ];
+                            $s = $o['status'];
+                            $icon = $statusMap[$s]['icon'] ?? 'question-circle';
+                            $text = $statusMap[$s]['text'] ?? ucfirst($s);
+                            ?>
+                            <i class="fas fa-<?= $icon ?> fa-xs"></i>
+                            <span><?= $text ?></span>
                         </span>
                     </div>
                     <div class="order-body">
@@ -709,7 +645,7 @@ $statusIcons = [
 
                         <div class="meta-row">
                             <span>Pengambilan</span>
-                            <strong><?= $o['pengambilan'] === 'ambil' ? 'Ambil di Toko' : 'Diantar' ?></strong>
+                            <strong><?= $o['pengambilan'] === 'ambil' ? 'Ambil' : 'Antar' ?></strong>
                         </div>
                         <div class="meta-row">
                             <span>Pembayaran</span>
@@ -719,22 +655,25 @@ $statusIcons = [
                         <div class="total">Rp <?= number_format($o['total'], 0, ',', '.') ?></div>
                     </div>
                     <div class="order-footer">
-                        <form method="POST" onsubmit="return confirm('Yakin ingin mengubah status pesanan #<?= (int)$o['id'] ?>?')">
+                        <form method="POST" onsubmit="return confirm('Ubah status pesanan #<?= (int)$o['id'] ?>?')">
                             <input type="hidden" name="id" value="<?= (int)$o['id'] ?>">
-                            <select name="status">
-                                <option value="baru" <?= $o['status'] === 'baru' ? 'selected' : '' ?>>Baru</option>
-                                <option value="diproses" <?= $o['status'] === 'diproses' ? 'selected' : '' ?>>Diproses</option>
-                                <option value="selesai" <?= $o['status'] === 'selesai' ? 'selected' : '' ?>>Selesai</option>
-                                <option value="batal" <?= $o['status'] === 'batal' ? 'selected' : '' ?>>Dibatalkan</option>
-                            </select>
-                            <button type="submit" name="update_status" class="btn btn-update">
-                                <i class="fas fa-sync-alt"></i> Simpan
-                            </button>
+                            <div class="status-update-group">
+                                <select name="status" class="status-select">
+                                    <option value="baru" <?= $o['status'] === 'baru' ? 'selected' : '' ?>>Baru</option>
+                                    <option value="diproses" <?= $o['status'] === 'diproses' ? 'selected' : '' ?>>Diproses</option>
+                                    <option value="selesai" <?= $o['status'] === 'selesai' ? 'selected' : '' ?>>Selesai</option>
+                                    <option value="batal" <?= $o['status'] === 'batal' ? 'selected' : '' ?>>Dibatalkan</option>
+                                </select>
+                                <button type="submit" name="update_status" class="btn-icon" title="Simpan">
+                                    <i class="fas fa-sync-alt fa-xs"></i>
+                                </button>
+                            </div>
                         </form>
                         <a href="?hapus=<?= (int)$o['id'] ?><?= $q ? '&q=' . urlencode($q) : '' ?><?= $status_filter ? ($q ? '&' : '?') . 'status=' . urlencode($status_filter) : '' ?>"
-                           class="btn btn-delete"
-                           onclick="return confirm('Yakin hapus pesanan #<?= (int)$o['id'] ?>? Data tidak bisa dikembalikan.')">
-                            <i class="fas fa-trash-alt"></i> Hapus
+                           class="btn-icon btn-danger"
+                           title="Hapus"
+                           onclick="return confirm('Yakin hapus pesanan #<?= (int)$o['id'] ?>?')">
+                            <i class="fas fa-trash-alt fa-xs"></i>
                         </a>
                     </div>
                 </div>
@@ -743,102 +682,87 @@ $statusIcons = [
     </div>
 
     <?php if ($total_pages > 1): ?>
-        <!-- PAGINATION -->
         <div class="pagination">
-            <!-- Tombol Previous -->
             <?php if ($page > 1): ?>
                 <a href="?page=<?= $page - 1 ?><?= $q ? '&q=' . urlencode($q) : '' ?><?= $status_filter ? '&status=' . urlencode($status_filter) : '' ?>">
-                    <i class="fas fa-chevron-left"></i> Prev
+                    <i class="fas fa-chevron-left"></i>
                 </a>
             <?php else: ?>
-                <span class="disabled">
-                    <i class="fas fa-chevron-left"></i> Prev
-                </span>
+                <span class="disabled"><i class="fas fa-chevron-left"></i></span>
             <?php endif; ?>
 
-            <!-- Nomor Halaman -->
             <?php
-            // Tampilkan maksimal 5 nomor halaman
-            $start_page = max(1, $page - 2);
-            $end_page = min($total_pages, $page + 2);
-            
-            // Tampilkan halaman 1 jika tidak termasuk range
-            if ($start_page > 1): ?>
-                <a href="?page=1<?= $q ? '&q=' . urlencode($q) : '' ?><?= $status_filter ? '&status=' . urlencode($status_filter) : '' ?>">1</a>
-                <?php if ($start_page > 2): ?>
-                    <span>...</span>
-                <?php endif; ?>
-            <?php endif; ?>
+            $start = max(1, $page - 1);
+            $end = min($total_pages, $page + 1);
+            if ($start > 1) echo '<a href="?page=1' . ($q ? '&q=' . urlencode($q) : '') . ($status_filter ? '&status=' . urlencode($status_filter) : '') . '">1</a>';
+            if ($start > 2) echo '<span>...</span>';
+            for ($i = $start; $i <= $end; $i++) {
+                echo $i == $page 
+                    ? '<span class="active">' . $i . '</span>' 
+                    : '<a href="?page=' . $i . ($q ? '&q=' . urlencode($q) : '') . ($status_filter ? '&status=' . urlencode($status_filter) : '') . '">' . $i . '</a>';
+            }
+            if ($end < $total_pages - 1) echo '<span>...</span>';
+            if ($end < $total_pages) echo '<a href="?page=' . $total_pages . ($q ? '&q=' . urlencode($q) : '') . ($status_filter ? '&status=' . urlencode($status_filter) : '') . '">' . $total_pages . '</a>';
+            ?>
 
-            <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
-                <?php if ($i == $page): ?>
-                    <span class="active"><?= $i ?></span>
-                <?php else: ?>
-                    <a href="?page=<?= $i ?><?= $q ? '&q=' . urlencode($q) : '' ?><?= $status_filter ? '&status=' . urlencode($status_filter) : '' ?>"><?= $i ?></a>
-                <?php endif; ?>
-            <?php endfor; ?>
-
-            <!-- Tampilkan halaman terakhir jika tidak termasuk range -->
-            <?php if ($end_page < $total_pages): ?>
-                <?php if ($end_page < $total_pages - 1): ?>
-                    <span>...</span>
-                <?php endif; ?>
-                <a href="?page=<?= $total_pages ?><?= $q ? '&q=' . urlencode($q) : '' ?><?= $status_filter ? '&status=' . urlencode($status_filter) : '' ?>"><?= $total_pages ?></a>
-            <?php endif; ?>
-
-            <!-- Tombol Next -->
             <?php if ($page < $total_pages): ?>
                 <a href="?page=<?= $page + 1 ?><?= $q ? '&q=' . urlencode($q) : '' ?><?= $status_filter ? '&status=' . urlencode($status_filter) : '' ?>">
-                    Next <i class="fas fa-chevron-right"></i>
+                    <i class="fas fa-chevron-right"></i>
                 </a>
             <?php else: ?>
-                <span class="disabled">
-                    Next <i class="fas fa-chevron-right"></i>
-                </span>
+                <span class="disabled"><i class="fas fa-chevron-right"></i></span>
             <?php endif; ?>
         </div>
-
         <div class="pagination-info">
-            Menampilkan halaman <?= $page ?> dari <?= $total_pages ?> (Total: <?= $total_orders ?> pesanan)
+            Halaman <?= $page ?> dari <?= $total_pages ?> • Total: <?= $total_orders ?> pesanan
         </div>
     <?php endif; ?>
 </div>
 
 <script>
-// Filter berdasarkan status
 function filterByStatus(status) {
     const url = new URL(window.location);
-    const currentStatus = url.searchParams.get('status');
-    
-    // Toggle: jika status yang sama diklik, hapus filter
-    if (currentStatus === status) {
-        url.searchParams.delete('status');
-    } else {
-        url.searchParams.set('status', status);
-    }
-    
+    url.searchParams.get('status') === status 
+        ? url.searchParams.delete('status') 
+        : url.searchParams.set('status', status);
     window.location.href = url.toString();
 }
 
-// Submit pencarian dengan mempertahankan filter status
 function submitSearch() {
     const q = document.getElementById('search').value.trim();
     const url = new URL(window.location);
-    
-    if (q) {
-        url.searchParams.set('q', q);
-    } else {
-        url.searchParams.delete('q');
-    }
-    
+    q ? url.searchParams.set('q', q) : url.searchParams.delete('q');
     window.location.href = url.toString();
 }
 
-// Reset semua filter (status dan pencarian)
 function resetAll() {
     const url = new URL(window.location);
     url.searchParams.delete('q');
     url.searchParams.delete('status');
+    window.location.href = url.toString();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Tekan Enter di input langsung submit
+    const searchInput = document.getElementById('search');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.closest('form').submit();
+            }
+        });
+    }
+});
+
+// Filter status — pertahankan q
+function filterByStatus(status) {
+    const url = new URL(window.location);
+    if (status) {
+        url.searchParams.set('status', status);
+    } else {
+        url.searchParams.delete('status');
+    }
     window.location.href = url.toString();
 }
 </script>

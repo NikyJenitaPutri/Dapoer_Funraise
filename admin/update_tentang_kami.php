@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_tentang'])) {
     $content = trim($_POST['content'] ?? '');
 
     if (!$title || !$subtitle || !$content) {
-        $_SESSION['tk_alert'] = '❌ Gagal: Semua field wajib diisi.';
+        $_SESSION['tk_alert'] = 'Gagal: Semua field wajib diisi.';
     } else {
         try {
             $stmt = $pdo->prepare("
@@ -25,9 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_tentang'])) {
                     updated_at = NOW()
             ");
             $stmt->execute([$title, $subtitle, $content]);
-            $_SESSION['tk_alert'] = '✅ Konten "Tentang Kami" berhasil diperbarui.';
+            $_SESSION['tk_alert'] = 'Konten "Tentang Kami" berhasil diperbarui.';
         } catch (Exception $e) {
-            $_SESSION['tk_alert'] = '❌ Gagal menyimpan: ' . $e->getMessage();
+            $_SESSION['tk_alert'] = 'Gagal menyimpan: ' . $e->getMessage();
         }
     }
 }

@@ -9,7 +9,7 @@ $stmt = $pdo->prepare("SELECT * FROM contact_cards WHERE id = ?");
 $stmt->execute([$id]);
 $card = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$card) {
-    $_SESSION['kontak_alert'] = '❌ Kontak tidak ditemukan.';
+    $_SESSION['kontak_alert'] = 'Kontak tidak ditemukan.';
     header('Location: kontak.php');
     exit;
 }
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $is_active = isset($_POST['is_active']) ? 1 : 0;
 
     if (!$icon || !$title || !$label || !$href) {
-        $alert = '❌ Semua field wajib diisi.';
+        $alert = 'Semua field wajib diisi.';
     } else {
         try {
             $pdo->prepare("
@@ -32,11 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 SET icon_class = ?, title = ?, label = ?, href = ?, sort_order = ?, is_active = ?
                 WHERE id = ?
             ")->execute([$icon, $title, $label, $href, $sort, $is_active, $id]);
-            $_SESSION['kontak_alert'] = '✅ Kontak berhasil diperbarui.';
+            $_SESSION['kontak_alert'] = 'Kontak berhasil diperbarui.';
             header('Location: kontak.php');
             exit;
         } catch (Exception $e) {
-            $alert = '❌ Gagal memperbarui: ' . $e->getMessage();
+            $alert = 'Gagal memperbarui: ' . $e->getMessage();
         }
     }
 }

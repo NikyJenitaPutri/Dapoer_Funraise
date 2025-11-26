@@ -1,34 +1,91 @@
 <?php
 require 'config.php';
 
-// 🔹 Ambil data produk
+// 🔹 Ambil & validasi ID
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 if (!$id) {
-    die('<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Error</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"><style>body{font-family:sans-serif;text-align:center;padding:3rem;background:#f8f9fa;}</style></head><body><div style="max-width:600px;margin:auto;background:white;padding:2rem;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);"><h2><i class="fas fa-times-circle" style="color:#B64B62"></i> ID produk tidak valid.</h2><p><a href="index.php" style="display:inline-block;margin-top:1rem;padding:0.5rem 1.5rem;background:#5A46A2;color:white;text-decoration:none;border-radius:6px;">Kembali ke Beranda</a></p></div></body></html>');
+    http_response_code(400);
+    ?>
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Error</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <style>body{font-family:sans-serif;text-align:center;padding:2rem;background:#faf9ff;}</style>
+    </head>
+    <body>
+        <div style="max-width:600px;margin:auto;background:white;padding:1.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(90,70,162,0.1);">
+            <h2><i class="fas fa-times-circle" style="color:#B64B62"></i> ID produk tidak valid.</h2>
+            <p><a href="index.php" style="display:inline-block;margin-top:1rem;padding:0.6rem 1.4rem;background:#5A46A2;color:white;text-decoration:none;border-radius:8px;">Kembali ke Beranda</a></p>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
 }
 
+// 🔹 Ambil data produk
 try {
     $stmt = $pdo->prepare('SELECT * FROM produk WHERE ID = ?');
     $stmt->execute([$id]);
     $p = $stmt->fetch();
 
     if (!$p) {
-        die('<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Error</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"><style>body{font-family:sans-serif;text-align:center;padding:3rem;background:#f8f9fa;}</style></head><body><div style="max-width:600px;margin:auto;background:white;padding:2rem;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);"><h2><i class="fas fa-search" style="color:#5A46A2"></i> Produk tidak ditemukan.</h2><p><a href="index.php" style="display:inline-block;margin-top:1rem;padding:0.5rem 1.5rem;background:#5A46A2;color:white;text-decoration:none;border-radius:6px;">Kembali ke Beranda</a></p></div></body></html>');
+        http_response_code(404);
+        ?>
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>Error</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+            <style>body{font-family:sans-serif;text-align:center;padding:2rem;background:#faf9ff;}</style>
+        </head>
+        <body>
+            <div style="max-width:600px;margin:auto;background:white;padding:1.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(90,70,162,0.1);">
+                <h2><i class="fas fa-search" style="color:#5A46A2"></i> Produk tidak ditemukan.</h2>
+                <p><a href="index.php" style="display:inline-block;margin-top:1rem;padding:0.6rem 1.4rem;background:#5A46A2;color:white;text-decoration:none;border-radius:8px;">Kembali ke Beranda</a></p>
+            </div>
+        </body>
+        </html>
+        <?php
+        exit;
     }
 } catch (Exception $e) {
     error_log("Detail Produk Error (ID: $id): " . $e->getMessage());
-    die('<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Error</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"><style>body{font-family:sans-serif;text-align:center;padding:3rem;background:#f8f9fa;}</style></head><body><div style="max-width:600px;margin:auto;background:white;padding:2rem;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1);"><h2><i class="fas fa-exclamation-triangle" style="color:#B64B62"></i> Terjadi kesalahan sistem.</h2><p><a href="index.php" style="display:inline-block;margin-top:1rem;padding:0.5rem 1.5rem;background:#5A46A2;color:white;text-decoration:none;border-radius:6px;">Kembali ke Beranda</a></p></div></body></html>');
+    http_response_code(500);
+    ?>
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>Error</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        <style>body{font-family:sans-serif;text-align:center;padding:2rem;background:#faf9ff;}</style>
+    </head>
+    <body>
+        <div style="max-width:600px;margin:auto;background:white;padding:1.5rem;border-radius:8px;box-shadow:0 4px 12px rgba(90,70,162,0.1);">
+            <h2><i class="fas fa-exclamation-triangle" style="color:#B64B62"></i> Terjadi kesalahan sistem.</h2>
+            <p><a href="index.php" style="display:inline-block;margin-top:1rem;padding:0.6rem 1.4rem;background:#5A46A2;color:white;text-decoration:none;border-radius:8px;">Kembali ke Beranda</a></p>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
 }
 
+// 🔹 Helper
 function formatHarga(float $harga): string {
     return "Rp " . number_format($harga, 0, ',', '.');
 }
 
-// 🔹 Parsing varian (teks saja)
-$varian_list = [];
-if (!empty($p['Varian'])) {
-    $varian_list = array_filter(array_map('trim', explode(',', $p['Varian'])));
-}
+$varian_list = !empty($p['Varian']) ? array_filter(array_map('trim', explode(',', $p['Varian']))) : [];
+$created_at = $p['created_at'] ?? 'now';
+$formatted_date = date('d M Y', strtotime($created_at));
 ?>
 
 <!DOCTYPE html>
@@ -47,458 +104,331 @@ if (!empty($p['Varian'])) {
             --bg-light: #FFF5EE;
             --soft: #DFBEE0;
             --text-muted: #9180BB;
+            --border: #f0eaff;
+            --shadow: 0 4px 12px rgba(90, 70, 162, 0.1);
+            --fs-xs: 0.8125rem;
+            --fs-sm: 0.875rem;
+            --fs-md: 0.9375rem;
+            --fs-lg: 1rem;
+            --gap-xs: 0.4rem;
+            --gap-sm: 0.6rem;
+            --gap-md: 0.8rem;
+            --gap-lg: 1rem;
+            --radius: 8px;
+            --btn-h: 38px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
-            font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: linear-gradient(135deg, var(--bg-light) 0%, #f9f5ff 100%);
+            font-family: 'Poppins', sans-serif;
+            background: #faf9ff;
             color: #333;
-            display: flex;
-            flex-direction: column;
-            font-size: 15px;
+            font-size: var(--fs-md);
+            line-height: 1.5;
+            padding: 0;
         }
 
-        /* 🔹 MAIN CONTENT - ENLARGED */
-        .main-content {
-            flex: 1;
-            max-width: 1400px;
+        .main-wrapper {
+            max-width: 1120px;
             margin: 0 auto;
-            padding: 1.5rem;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            min-height: calc(100vh - 3rem);
+            padding: 0rem;
         }
 
-        /* 🔹 PRODUCT DETAIL CARD - ENLARGED */
-        .product-detail-card {
+        .detail-card {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(90, 70, 162, 0.18);
-            overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.03);
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .detail-body {
-            display: flex;
-            gap: 2.5rem;
-            padding: 2rem;
-            flex: 1;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
             overflow: hidden;
         }
 
-        /* 🔹 GALLERY - ENLARGED */
-        .gallery-section {
-            flex: 0 0 48%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .main-image-container {
-            background: #fafafa;
-            border-radius: 12px;
-            padding: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            border: 2px solid #f0eaff;
-            min-height: 450px;
-        }
-
-        .main-image-container img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
-        .no-image {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--bg-light), #f9f5ff);
-            border: 2px dashed var(--soft);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
-        }
-        .no-image i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.6;
-        }
-        .no-image p {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        /* 🔹 INFO SECTION - ENLARGED */
-        .info-section {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            overflow-y: auto;
-            padding-right: 0.5rem;
-        }
-
-        .product-id-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #f5f3ff, #faf5ff);
-            border: 1px solid #f0eaff;
-            border-radius: 20px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 600;
-            width: fit-content;
-        }
-
-        .product-title {
-            font-size: 2.2rem;
+        .detail-header {
+            background: #f9f7ff;
             color: var(--primary);
-            font-weight: 700;
-            line-height: 1.2;
-            margin: 0;
-        }
-
-        .price-box {
-            background: linear-gradient(135deg, #fff5f7, #fff8fa);
-            border: 2px solid #ffe5eb;
-            border-radius: 12px;
-            padding: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .price-box i {
-            font-size: 1.8rem;
-            color: var(--secondary);
-        }
-        .price-label {
-            font-size: 0.85rem;
-            color: #999;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-        .price-value {
-            font-size: 1.9rem;
-            font-weight: 700;
-            color: var(--secondary);
-        }
-
-        /* 🔹 VARIANT BOX - ENLARGED */
-        .variant-box {
-            background: linear-gradient(135deg, #faf5ff, #f9f5ff);
-            border: 2px solid #f0eaff;
-            border-radius: 12px;
-            padding: 1.5rem;
-        }
-        .variant-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-            color: var(--primary);
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-        }
-        .variant-header i {
-            color: var(--secondary);
-            font-size: 1.2rem;
-        }
-        .variant-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .variant-tag {
-            background: var(--soft);
-            color: var(--primary);
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 0.6rem 1rem;
             font-size: 1rem;
             font-weight: 600;
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.2s;
-        }
-        .variant-tag:hover {
-            background: #d0a8d5;
-            transform: translateY(-1px);
-        }
-        .no-variant {
-            color: var(--text-muted);
-            font-style: italic;
-            font-size: 1rem;
         }
 
-        /* 🔹 DESCRIPTION BOX - ENLARGED */
-        .description-box {
-            background: #fbf9ff;
-            border: 2px solid #f3f0ff;
-            border-radius: 12px;
-            padding: 1.5rem;
+        .detail-body {
+            padding: var(--gap-sm);
         }
-        .description-header {
+
+        /* 🔸 Layout 3 kolom: gambar | meta | deskripsi */
+        .detail-content {
+            display: grid;
+            grid-template-columns: 260px 1fr 300px;
+            gap: var(--gap-md);
+        }
+
+        /* Responsif */
+        @media (max-width: 900px) {
+            .detail-content {
+                grid-template-columns: 200px 1fr;
+                grid-template-areas:
+                    "image meta"
+                    "image desc";
+            }
+            .image-section { grid-area: image; }
+            .meta-section { grid-area: meta; }
+            .description-box { grid-area: desc; }
+        }
+
+        @media (max-width: 768px) {
+            .detail-content {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "image"
+                    "meta"
+                    "desc";
+            }
+            .image-section,
+            .meta-section,
+            .description-box {
+                grid-area: auto;
+            }
+            .product-img-container { aspect-ratio: 4/3; }
+        }
+
+        .image-section { flex-shrink: 0; }
+        .product-img-container {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #fcfbff;
+            border-radius: var(--radius);
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: var(--radius);
+        }
+
+        .no-image {
+            color: var(--text-muted);
+            font-size: 2.4rem;
+        }
+
+        .meta-section,
+        .description-box {
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-md);
+        }
+
+        .product-id {
+            font-size: var(--fs-xs);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: var(--gap-xs);
+        }
+
+        .product-title {
+            font-size: 1.25rem;
             font-weight: 700;
             color: var(--primary);
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
+            margin: 0 0 var(--gap-sm);
+            line-height: 1.3;
         }
-        .description-header i {
-            color: var(--secondary);
-            font-size: 1.2rem;
+
+        .product-meta {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: var(--gap-md);
         }
+
+        .price-tag {
+            background: var(--secondary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: var(--fs-md);
+        }
+
+        .variant-inline {
+            color: var(--primary);
+            opacity: 0.85;
+            font-size: var(--fs-sm);
+        }
+        .variant-inline::before { content: "•"; margin: 0 0.4rem; color: var(--text-muted); }
+
+        .section-label {
+            font-size: var(--fs-sm);
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .variant-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .variant-tag {
+            background: var(--soft);
+            color: var(--primary);
+            padding: 3px 10px;
+            border-radius: 16px;
+            font-size: var(--fs-xs);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
         .description-text {
-            font-size: 1rem;
-            line-height: 1.7;
-            color: #555;
-            max-height: 350px;
+            font-size: var(--fs-md);
+            line-height: 1.5;
+            color: #444;
+            white-space: pre-line;
+            max-height: 220px;
             overflow-y: auto;
+            padding-right: 4px;
         }
 
-        /* 🔹 META INFO - ENLARGED */
         .meta-info {
-            padding: 1rem 1.2rem;
-            background: #f8f9fa;
-            border-radius: 10px;
+            font-size: var(--fs-xs);
+            color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 500;
+            gap: 5px;
+            margin-top: auto;
+            padding-top: var(--gap-sm);
+            border-top: 1px dashed var(--border);
         }
 
-        /* 🔹 ACTION BAR - ENLARGED */
         .action-bar {
-            padding: 2rem 2rem;
+            padding: 0.6rem 1rem;
             background: #fbf9ff;
-            border-top: 2px solid #f3f0ff;
+            border-top: 1px solid var(--border);
             display: flex;
-            gap: 12px;
-            flex-shrink: 0;
-            align-items: center;
+            gap: 8px;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
+            gap: 5px;
+            padding: 6px 14px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: var(--fs-md);
             text-decoration: none;
-            border: none;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
             font-family: inherit;
-            min-height: 48px;
-        }
-        .btn-back {
-            background: linear-gradient(135deg, var(--soft), #c8a5d0);
-            color: var(--primary);
-        }
-        .btn-back:hover {
-            background: linear-gradient(135deg, #d0a8d5, #c095cb);
-            transform: translateY(-2px);
+            min-height: var(--btn-h);
+            white-space: nowrap;
         }
 
-        /* 🔹 SCROLLBAR STYLING */
-        .info-section::-webkit-scrollbar,
-        .description-text::-webkit-scrollbar {
-            width: 6px;
-        }
-        .info-section::-webkit-scrollbar-track,
-        .description-text::-webkit-scrollbar-track {
-            background: #f0eaff;
-            border-radius: 10px;
-        }
-        .info-section::-webkit-scrollbar-thumb,
-        .description-text::-webkit-scrollbar-thumb {
+        .btn-secondary {
             background: var(--soft);
-            border-radius: 10px;
+            color: var(--primary);
+            flex: 1;
         }
-        .info-section::-webkit-scrollbar-thumb:hover,
-        .description-text::-webkit-scrollbar-thumb:hover {
-            background: var(--text-muted);
-        }
-
-        /* 🔹 RESPONSIVE */
-        @media (max-width: 992px) {
-            .detail-body {
-                flex-direction: column;
-                gap: 2rem;
-            }
-            .gallery-section {
-                flex: 0 0 auto;
-                height: 400px;
-            }
-            .main-image-container {
-                min-height: 350px;
-            }
-            .product-title {
-                font-size: 1.9rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                font-size: 14px;
-            }
-            .main-content {
-                padding: 1rem;
-                min-height: auto;
-            }
-            .detail-body {
-                padding: 1.5rem;
-            }
-            .gallery-section {
-                height: 300px;
-            }
-            .main-image-container {
-                min-height: 280px;
-                padding: 1.5rem;
-            }
-            .product-title {
-                font-size: 1.6rem;
-            }
-            .price-value {
-                font-size: 1.6rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .product-title {
-                font-size: 1.4rem;
-            }
-            .price-value {
-                font-size: 1.5rem;
-            }
-            .btn {
-                font-size: 0.95rem;
-                padding: 10px 18px;
-            }
-            .detail-body {
-                padding: 1.2rem;
-            }
+        .btn-secondary:hover {
+            background: #d5b4d9;
         }
     </style>
 </head>
 <body>
-    <main class="main-content">
-        <div class="product-detail-card">
+    <div class="main-wrapper">
+        <div class="detail-card">
+            <div class="detail-header">
+                <i class="fas fa-info-circle"></i>
+                Detail Produk
+            </div>
             <div class="detail-body">
-                <!-- 🔹 GALLERY SECTION -->
-                <div class="gallery-section">
-                    <div class="main-image-container">
-                        <?php 
-                        $foto_path = __DIR__ . '/uploads/' . $p['Foto_Produk'];
-                        if (!empty($p['Foto_Produk']) && @file_exists($foto_path)): 
-                        ?>
-                            <img src="uploads/<?= htmlspecialchars($p['Foto_Produk']) ?>" alt="<?= htmlspecialchars($p['Nama']) ?>">
-                        <?php else: ?>
-                            <div class="no-image">
-                                <i class="fas fa-image"></i>
-                                <p>Foto belum tersedia</p>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <!-- 🔹 INFO SECTION -->
-                <div class="info-section">
-                    <div class="product-id-badge">
-                        <i class="fas fa-barcode"></i>
-                        ID Produk: <?= (int)$p['ID'] ?>
+                <div class="detail-content">
+                    <!-- 🔹 Kolom 1: Gambar -->
+                    <div class="image-section">
+                        <div class="product-img-container">
+                            <?php if (!empty($p['Foto_Produk']) && @file_exists(__DIR__ . '/uploads/' . $p['Foto_Produk'])): ?>
+                                <img class="product-img" src="uploads/<?= htmlspecialchars($p['Foto_Produk']) ?>" alt="<?= htmlspecialchars($p['Nama']) ?>">
+                            <?php else: ?>
+                                <div class="no-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
 
-                    <h1 class="product-title"><?= htmlspecialchars($p['Nama']) ?></h1>
+                    <!-- 🔹 Kolom 2: Info Utama -->
+                    <div class="meta-section">
+                        <div class="product-id">
+                            <i class="fas fa-barcode"></i>
+                            ID: <?= (int)$p['ID'] ?>
+                        </div>
 
-                    <div class="price-box">
-                        <i class="fas fa-tags"></i>
+                        <h1 class="product-title"><?= htmlspecialchars($p['Nama']) ?></h1>
+
+                        <div class="product-meta">
+                            <span class="price-tag"><?= formatHarga((float)$p['Harga']) ?></span>
+                            <?php if (!empty($varian_list)): ?>
+                                <span class="variant-inline"><?= htmlspecialchars(implode(', ', $varian_list)) ?></span>
+                            <?php endif; ?>
+                        </div>
+
                         <div>
-                            <div class="price-label">Harga</div>
-                            <div class="price-value"><?= formatHarga((float)$p['Harga']) ?></div>
+                            <div class="section-label">
+                                <i class="fas fa-palette"></i> Varian Tersedia
+                            </div>
+                            <?php if (!empty($varian_list)): ?>
+                                <div class="variant-tags">
+                                    <?php foreach ($varian_list as $v): ?>
+                                        <span class="variant-tag">
+                                            <i class="fas fa-check"></i>
+                                            <?= htmlspecialchars($v) ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <p style="font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px;">Tidak ada varian khusus</p>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="meta-info">
+                            <i class="far fa-calendar-alt"></i>
+                            Ditambahkan: <?= htmlspecialchars($formatted_date) ?>
                         </div>
                     </div>
 
-                    <!-- 🔹 VARIANT BOX -->
-                    <div class="variant-box">
-                        <div class="variant-header">
-                            <i class="fas fa-palette"></i>
-                            Varian Tersedia
-                        </div>
-                        <?php if (!empty($varian_list)): ?>
-                            <div class="variant-tags">
-                                <?php foreach ($varian_list as $v): ?>
-                                    <span class="variant-tag">
-                                        <i class="fas fa-check-circle"></i>
-                                        <?= htmlspecialchars($v) ?>
-                                    </span>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php else: ?>
-                            <div class="no-variant">
-                                <i class="fas fa-info-circle"></i> Tidak ada varian khusus
-                            </div>
-                        <?php endif; ?>
-                    </div>
-
-                    <!-- 🔹 DESCRIPTION BOX -->
+                    <!-- 🔹 Kolom 3: Deskripsi (SEKARANG DI SEBELAH KANAN) -->
                     <div class="description-box">
-                        <div class="description-header">
-                            <i class="fas fa-align-left"></i>
-                            Deskripsi Produk
+                        <div class="section-label">
+                            <i class="fas fa-align-left"></i> Deskripsi Produk
                         </div>
                         <div class="description-text">
-                            <?= nl2br(htmlspecialchars($p['Deskripsi_Produk'])) ?>
+                            <?= nl2br(htmlspecialchars($p['Deskripsi_Produk'] ?: '—')) ?>
                         </div>
-                    </div>
-
-                    <div class="meta-info">
-                        <i class="far fa-calendar-alt"></i>
-                        Ditambahkan: <?= htmlspecialchars(date('d M Y', strtotime($p['created_at'] ?? 'now'))) ?>
                     </div>
                 </div>
             </div>
 
-            <!-- 🔹 ACTION BAR -->
             <div class="action-bar">
-                <a href="javascript:history.back()" class="btn btn-back">
+                <a href="javascript:history.back()" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Kembali
                 </a>
             </div>
         </div>
-    </main>
-
+    </div>
 </body>
 </html>

@@ -73,22 +73,12 @@ $msg = $_GET['msg'] ?? '';
             padding: 0;
             box-sizing: border-box;
         }
-
+        .container { margin: 0; padding: 0;}
         body {
             font-family: 'Poppins', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            padding: 1rem;
-            line-height: 1.5;
+
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 0.5rem;
-        }
-
-        /* === SATU SECTION: Header + Search (tanpa garis & tanpa emoji) === */
         .header-section {
             background: var(--card);
             border-radius: 14px;
@@ -290,7 +280,6 @@ $msg = $_GET['msg'] ?? '';
             font-style: italic;
         }
 
-        /* Action Buttons — shared */
         .btn-group {
             display: flex;
             gap: 0.5rem;
@@ -323,7 +312,6 @@ $msg = $_GET['msg'] ?? '';
             background: #ffd8d8;
         }
 
-        /* Mobile Cards */
         .produk-mobile {
             display: none;
             flex-direction: column;
@@ -409,7 +397,6 @@ $msg = $_GET['msg'] ?? '';
             font-size: 0.95rem;
         }
 
-        /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
@@ -491,7 +478,6 @@ $msg = $_GET['msg'] ?? '';
 <body>
 
 <div class="container">
-    <!-- SATU SECTION: Header + Search (tanpa garis, tanpa emoji) -->
     <div class="header-section">
         <div class="header-content">
             <div class="header-title">
@@ -527,7 +513,6 @@ $msg = $_GET['msg'] ?? '';
         </div>
     <?php endif; ?>
 
-    <!-- Desktop: Table -->
     <div class="table-responsive">
         <table class="table-admin">
             <thead>
@@ -591,7 +576,6 @@ $msg = $_GET['msg'] ?? '';
         </table>
     </div>
 
-    <!-- Mobile: Card List -->
     <div class="produk-mobile">
         <?php if (!empty($produk)): ?>
             <?php foreach ($produk as $p): ?>

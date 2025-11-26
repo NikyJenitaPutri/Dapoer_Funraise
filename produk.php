@@ -2,6 +2,18 @@
 session_start();
 require 'config.php';
 
+
+// Ambil data header
+$stmtHeader = $pdo->query("SELECT logo_path, business_name, tagline FROM header WHERE id = 1");
+$header = $stmtHeader->fetch(PDO::FETCH_ASSOC);
+if (!$header) {
+    $header = [
+        'logo_path' => 'assets/logo.png',
+        'business_name' => 'Dapoer Funraise',
+        'tagline' => 'Cemilan rumahan yang bikin nagih!'
+    ];
+}
+
 // 🔹 Hitung jumlah PRODUK UNIK (bukan total quantity)
 $cart_count = 0;
 if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
@@ -107,12 +119,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    
     html, body {
+        margin: 0; padding: 0;
         height: 100%;
         font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
         line-height: 1.6;
         color: #2d3748;
         scroll-behavior: smooth;
+        padding: 0;
     }
 
     body {
@@ -124,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     .app-header {
         background: linear-gradient(90deg, var(--primary), var(--secondary));
         color: white;
-        padding: 1.2rem 2rem;
+        padding: 0rem 0rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -157,13 +172,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     .logo:hover { transform: scale(1.02); }
 
     .logo-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 14px;
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.8rem;
+        font-size: 1.6rem;
         backdrop-filter: blur(4px);
     }
 
@@ -172,14 +187,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         flex-direction: column;
     }
     .logo-main {
-        font-size: 1.75rem;
+        font-size: 1.5rem;
         font-weight: 700;
         letter-spacing: -0.5px;
         color: white;
         text-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .logo-sub {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
         font-weight: 500;
         opacity: 0.9;
         color: rgba(255,255,255,0.95);
@@ -191,13 +206,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         position: relative;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 7px;
         color: white;
         text-decoration: none;
         font-weight: 600;
-        padding: 10px 20px;
-        border-radius: 12px;
-        font-size: 0.98rem;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 0.9rem;
         transition: all 0.3s ease;
         background: rgba(255,255,255,0.1);
         backdrop-filter: blur(10px);
@@ -210,14 +225,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
 
     .cart-badge {
         position: absolute;
-        top: -6px;
-        right: -6px;
+        top: -5px;
+        right: -5px;
         background: linear-gradient(135deg, var(--accent), #ffd54f);
         color: #333;
         font-weight: 800;
-        font-size: 0.72rem;
-        min-width: 22px;
-        height: 22px;
+        font-size: 0.68rem;
+        min-width: 20px;
+        height: 20px;
         border-radius: 50%;
         display: flex;
         align-items: center;
@@ -230,16 +245,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     .container {
         max-width: 1400px;
         margin: 0 auto;
-        padding: 2rem 1.5rem;
+        padding: 2rem 2rem;
     }
 
     .page-title {
-        font-size: 2.5rem;
+        font-size: 2rem;
         background: linear-gradient(135deg, var(--primary), var(--secondary));
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        margin: 0 0 2rem;
+        margin: 0 0 1.5rem;
         text-align: center;
         font-weight: 900;
         letter-spacing: -1px;
@@ -247,10 +262,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     .page-title::after {
         content: '';
         display: block;
-        width: 80px;
-        height: 4px;
+        width: 60px;
+        height: 3px;
         background: linear-gradient(90deg, var(--primary), var(--secondary));
-        margin: 0.8rem auto 0;
+        margin: 0.6rem auto 0;
         border-radius: 4px;
     }
 
@@ -285,8 +300,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
 
     .products-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-        gap: 2rem;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
     }
 
     /* Product Card Premium */
@@ -322,7 +337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
 
     .product-img {
         width: 100%;
-        height: 300px;
+        height: 210px;
         background: linear-gradient(135deg, #faf8ff, #f3f0ff);
         display: flex;
         align-items: center;
@@ -351,15 +366,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     }
 
     .product-body {
-        padding: 1.2rem 1.5rem; /* reduced vertical padding */
+        padding: 0rem 0rem;
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 0.7rem; /* tighter spacing */
+        gap: 0.55rem;
     }
 
     .product-name {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
         font-weight: 700;
         color: var(--primary);
         margin: 0;
@@ -368,7 +383,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     }
 
     .product-price {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: 800;
         background: linear-gradient(135deg, var(--secondary), #d6536f);
         -webkit-background-clip: text;
@@ -379,7 +394,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
 
     /* === DESKRIPSI DROPDOWN === */
     .desc-toggle {
-        font-size: 0.92rem;
+        font-size: 0.88rem;
         color: #64748b;
         background: none;
         border: none;
@@ -421,10 +436,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     }
 
     .desc-text {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         line-height: 1.6;
         color: #4b5563;
-        padding: 12px 16px;
+        padding: 10px 14px;
         background: #fcfbff;
         border-radius: 10px;
         margin-top: 8px;
@@ -433,8 +448,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     /* 🔹 Compact form group with inline cart icon */
     .form-group.compact {
         display: flex;
-        gap: 0.8rem;
-        margin-top: 0.3rem;
+        gap: 0.6rem;
+        margin-top: 0.2rem;
         align-items: flex-end;
     }
     .form-group.compact > div {
@@ -443,20 +458,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     .input-label {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
         font-weight: 600;
         color: var(--primary);
-        margin-bottom: 6px;
-        font-size: 0.92rem;
+        margin-bottom: 5px;
+        font-size: 0.88rem;
     }
 
     .form-control {
         width: 100%;
-        padding: 11px 14px;
+        padding: 9px 12px;
         border: 2px solid #e2e8f0;
-        border-radius: 12px;
+        border-radius: 10px;
         background: #f8fafc;
-        font-size: 0.98rem;
+        font-size: 0.92rem;
         color: #2d3748;
         font-family: inherit;
         font-weight: 500;
@@ -485,13 +500,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 48px;
-        height: 48px;
+        width: 44px;
+        height: 44px;
         background: linear-gradient(135deg, var(--primary), var(--primary-dark));
         color: white;
         border: none;
-        border-radius: 12px;
-        font-size: 1.2rem;
+        border-radius: 10px;
+        font-size: 1.1rem;
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 3px 8px rgba(90, 70, 162, 0.25);
@@ -561,148 +576,148 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
 </style>
 </head>
 <body>
+    <div class="container-fluid">
+        <header class="app-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="<?= htmlspecialchars($header['logo_path']) ?>" alt="Logo <?= htmlspecialchars($header['business_name']) ?>" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <div class="logo-text">
+                    <span class="logo-main"><?= htmlspecialchars($header['business_name']) ?></span>
+                    <span class="logo-sub"><?= htmlspecialchars($header['tagline']) ?></span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.php" class="nav-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Beranda</span>
+                </a>
+                <a href="keranjang.php" class="nav-link">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Keranjang</span>
+                    <?php if ($cart_count > 0): ?>
+                        <span class="cart-badge"><?= $cart_count ?></span>
+                    <?php endif; ?>
+                </a>
+            </div>
+        </header>
 
-    <header class="app-header">
-        <a href="index.php" class="logo">
-            <div class="logo-icon">
-                <img src="assets/logo.png" alt="Logo Dapoer Funraise" style="width: 100%; height: 100%; object-fit: contain;">
-            </div>
-            <div class="logo-text">
-                <div class="logo-main">Dapoer Funraise</div>
-                <div class="logo-sub">Cemilan rumahan yang bikin nagih!</div>
-            </div>
-        </a>
-        <div class="nav-links">
-            <a href="index.php" class="nav-link">
-                <i class="fas fa-arrow-left"></i>
-                <span>Beranda</span>
-            </a>
-            <a href="keranjang.php" class="nav-link">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Keranjang</span>
-                <?php if ($cart_count > 0): ?>
-                    <span class="cart-badge"><?= $cart_count ?></span>
-                <?php endif; ?>
-            </a>
-        </div>
-    </header>
+        <main class="container">
+            <h1 class="page-title">Produk Kami</h1>
 
-    <main class="container">
-        <h1 class="page-title">Produk Kami</h1>
+            <?php if ($success): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> <?= $success ?>
+                </div>
+            <?php elseif ($error): ?>
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($error) ?>
+                </div>
+            <?php endif; ?>
 
-        <?php if ($success): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i> <?= $success ?>
-            </div>
-        <?php elseif ($error): ?>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-triangle"></i> <?= htmlspecialchars($error) ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if (empty($produk_list)): ?>
-            <div class="empty-state">
-                <i class="fas fa-scarf"></i>
-                <h3>Belum Ada Produk</h3>
-                <p>Admin belum menambahkan produk. Cek kembali nanti ya~</p>
-            </div>
-        <?php else: ?>
-            <div class="products-grid">
-                <?php foreach ($produk_list as $p):
-                    $varian_list = !empty($p['varian'])
-                        ? array_filter(array_map('trim', explode(',', $p['varian'])))
-                        : [];
-                    $deskripsi = $p['deskripsi'] ?? 'Deskripsi tidak tersedia';
-                ?>
-                    <div class="product-card">
-                        <div class="product-img">
-                            <?php if (!empty($p['foto']) && file_exists('uploads/' . $p['foto'])): ?>
-                                <img src="uploads/<?= htmlspecialchars($p['foto']) ?>" 
-                                     alt="<?= htmlspecialchars($p['nama']) ?>"
-                                     loading="lazy">
-                            <?php else: ?>
-                                <i class="fas fa-cookie-bite" style="font-size:4.5rem; color:var(--soft); opacity: 0.4;"></i>
-                            <?php endif; ?>
-                        </div>
-                        <div class="product-body">
-                            <h2 class="product-name"><?= htmlspecialchars($p['nama']) ?></h2>
-                            <div class="product-price">Rp <?= number_format($p['harga'], 0, ',', '.') ?></div>
-                            
-                            <!-- 🔹 DESKRIPSI DROPDOWN -->
-                            <div class="desc-wrapper">
-                                <button class="desc-toggle" type="button" aria-expanded="false">
-                                    <i class="fas fa-chevron-down"></i>
-                                    <span>Lihat deskripsi lengkap</span>
-                                </button>
-                                <div class="desc-content">
-                                    <div class="desc-text"><?= nl2br(htmlspecialchars($deskripsi)) ?></div>
-                                </div>
+            <?php if (empty($produk_list)): ?>
+                <div class="empty-state">
+                    <i class="fas fa-scarf"></i>
+                    <h3>Belum Ada Produk</h3>
+                    <p>Admin belum menambahkan produk. Cek kembali nanti ya~</p>
+                </div>
+            <?php else: ?>
+                <div class="products-grid">
+                    <?php foreach ($produk_list as $p):
+                        $varian_list = !empty($p['varian'])
+                            ? array_filter(array_map('trim', explode(',', $p['varian'])))
+                            : [];
+                        $deskripsi = $p['deskripsi'] ?? 'Deskripsi tidak tersedia';
+                    ?>
+                        <div class="product-card">
+                            <div class="product-img">
+                                <?php if (!empty($p['foto']) && file_exists('uploads/' . $p['foto'])): ?>
+                                    <img src="uploads/<?= htmlspecialchars($p['foto']) ?>" 
+                                        alt="<?= htmlspecialchars($p['nama']) ?>"
+                                        loading="lazy">
+                                <?php else: ?>
+                                    <i class="fas fa-cookie-bite" style="font-size:4.5rem; color:var(--soft); opacity: 0.4;"></i>
+                                <?php endif; ?>
                             </div>
-
-                            <!-- 🔹 Compact Form with Inline Cart Icon -->
-                            <form method="POST" class="add-to-cart-form">
-                                <input type="hidden" name="id" value="<?= (int)$p['id'] ?>">
-
-                                <div class="form-group compact">
-                                    <div>
-                                        <label class="input-label" for="qty_<?= $p['id'] ?>">
-                                            <i class="fas fa-hashtag"></i> Jumlah
-                                        </label>
-                                        <input 
-                                            type="number" 
-                                            id="qty_<?= $p['id'] ?>" 
-                                            name="quantity" 
-                                            value="1" 
-                                            min="1" 
-                                            max="20"
-                                            class="form-control qty-input"
-                                            required
-                                        >
+                            <div class="product-body">
+                                <h2 class="product-name"><?= htmlspecialchars($p['nama']) ?></h2>
+                                <div class="product-price">Rp <?= number_format($p['harga'], 0, ',', '.') ?></div>
+                                
+                                <!-- 🔹 DESKRIPSI DROPDOWN -->
+                                <div class="desc-wrapper">
+                                    <button class="desc-toggle" type="button" aria-expanded="false">
+                                        <i class="fas fa-chevron-down"></i>
+                                        <span>Lihat deskripsi lengkap</span>
+                                    </button>
+                                    <div class="desc-content">
+                                        <div class="desc-text"><?= nl2br(htmlspecialchars($deskripsi)) ?></div>
                                     </div>
+                                </div>
 
-                                    <?php if (!empty($varian_list)): ?>
+                                <!-- 🔹 Compact Form with Inline Cart Icon -->
+                                <form method="POST" class="add-to-cart-form">
+                                    <input type="hidden" name="id" value="<?= (int)$p['id'] ?>">
+
+                                    <div class="form-group compact">
                                         <div>
-                                            <label class="input-label" for="var_<?= $p['id'] ?>">
-                                                <i class="fas fa-tags"></i> Varian
+                                            <label class="input-label" for="qty_<?= $p['id'] ?>">
+                                                <i class="fas fa-hashtag"></i> Jumlah
                                             </label>
-                                            <select 
-                                                id="var_<?= $p['id'] ?>" 
-                                                name="varian_pilih" 
-                                                class="form-control variant-select"
+                                            <input 
+                                                type="number" 
+                                                id="qty_<?= $p['id'] ?>" 
+                                                name="quantity" 
+                                                value="1" 
+                                                min="1" 
+                                                max="20"
+                                                class="form-control qty-input"
                                                 required
                                             >
-                                                <option value="">Pilih Varian</option>
-                                                <?php foreach ($varian_list as $v): ?>
-                                                    <option value="<?= htmlspecialchars($v) ?>"><?= htmlspecialchars($v) ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
                                         </div>
-                                    <?php else: ?>
-                                        <input type="hidden" name="varian_pilih" value="">
-                                    <?php endif; ?>
 
-                                    <button 
-                                        type="submit" 
-                                        name="add_to_cart" 
-                                        class="inline-cart-btn"
-                                        title="Tambah ke keranjang"
-                                        aria-label="Tambah <?= htmlspecialchars($p['nama']) ?> ke keranjang"
-                                    >
-                                        <i class="fas fa-cart-plus"></i>
-                                    </button>
-                                </div>
-                            </form>
+                                        <?php if (!empty($varian_list)): ?>
+                                            <div>
+                                                <label class="input-label" for="var_<?= $p['id'] ?>">
+                                                    <i class="fas fa-tags"></i> Varian
+                                                </label>
+                                                <select 
+                                                    id="var_<?= $p['id'] ?>" 
+                                                    name="varian_pilih" 
+                                                    class="form-control variant-select"
+                                                    required
+                                                >
+                                                    <option value="">Pilih Varian</option>
+                                                    <?php foreach ($varian_list as $v): ?>
+                                                        <option value="<?= htmlspecialchars($v) ?>"><?= htmlspecialchars($v) ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        <?php else: ?>
+                                            <input type="hidden" name="varian_pilih" value="">
+                                        <?php endif; ?>
+
+                                        <button 
+                                            type="submit" 
+                                            name="add_to_cart" 
+                                            class="inline-cart-btn"
+                                            title="Tambah ke keranjang"
+                                            aria-label="Tambah <?= htmlspecialchars($p['nama']) ?> ke keranjang"
+                                        >
+                                            <i class="fas fa-cart-plus"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php endif; ?>
-    </main>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </main>
 
-    <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll ke atas">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-
+        <button class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll ke atas">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+    </div>
     <script>
         // Auto-hide alert
         document.querySelectorAll('.alert').forEach(alert => {
