@@ -313,7 +313,7 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             justify-content: center;
             align-items: center;
             scroll-snap-align: start;
-            scroll-margin-top: 110px; /* 👈👈 KUNCI UTAMA: hindari overlap header */
+            scroll-margin-top: 110px;
         }
 
         .section-title {
@@ -330,7 +330,7 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             font-size: 1.4rem;
             margin-bottom: 3rem;
             text-align: center;
-            max-width: 800px;
+            max-width: 700px;
             color: var(--dark);
             line-height: 1.6;
         }
