@@ -189,6 +189,12 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             transform: translateY(-3px);
         }
 
+        .app-header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
         /* === HEADER === */
         .app-header {
             background: linear-gradient(90deg, var(--secondary), var(--primary));
@@ -385,8 +391,10 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
-            width: 100%;
-            max-width: 1300px;
+            width: 97%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
         }
         .order-card {
             background: white;
@@ -443,12 +451,14 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             padding: 60px 20px;
         }
         .about-content-wrapper {
-            max-width: 1200px;
-            width: 100%;
+            max-width: 1400px;
+            width: 97%;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             align-items: center;
+            margin: 0 auto;
+            padding: 0;
         }
         .about-content {
             background: white;
@@ -545,39 +555,60 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
         /* TESTIMONI & FORM */
         #testimoni-section {
             background: linear-gradient(135deg, var(--purple-light), var(--cream));
-            padding: 60px 20px;
+            padding: 40px 0; /* Hapus padding horizontal, biarkan container yang mengatur */
             min-height: auto;
+            width: 100%;
         }
+
         .testimoni-combined {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            max-width: 1100px;
-            width: 100%;
+            gap: 24px;
+            width: 92%;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 0;
         }
+
         .testimoni-combined > div {
             background: white;
-            padding: 18px 16px;
-            border-radius: 12px;
+            padding: 24px 20px;
+            border-radius: 16px;
             box-shadow: var(--shadow-md);
             transition: var(--transition);
             display: flex;
             flex-direction: column;
+            width: 100%;
         }
+
         .testimoni-combined > div:hover {
-            transform: translateY(-3px);
+            transform: translateY(-5px);
             box-shadow: var(--shadow-lg);
         }
+
         .testimoni-combined h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.4rem;
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .testimoni-combined p.subtitle {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .testimoni-combined h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.3rem;
             color: var(--secondary);
             font-weight: 700;
         }
         .testimoni-combined p.subtitle {
-            margin-bottom: 1rem;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.8rem;
             color: #666;
         }
         .testimoni-list {
@@ -656,10 +687,10 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             font-family: serif;
         }
         .accordion-body blockquote p {
-            font-size: 1.05rem;
-            line-height: 1.6;
+            font-size: 0.95rem;
+            line-height: 1.5;
             color: #333;
-            margin: 1rem 0 0.8rem;
+            margin: 0.8rem 0 0.6rem;
             font-style: italic;
         }
         .testimoni-product {
@@ -979,22 +1010,24 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <header class="app-header">
-        <div class="logo">
-            <div class="logo-icon">
-                <img src="<?= htmlspecialchars($header['logo_path']) ?>" alt="Logo <?= htmlspecialchars($header['business_name']) ?>" style="width: 100%; height: 100%; object-fit: contain;">
+        <div class="container" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="<?= htmlspecialchars($header['logo_path']) ?>" alt="Logo <?= htmlspecialchars($header['business_name']) ?>" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <div class="logo-text">
+                    <span class="logo-main"><?= htmlspecialchars($header['business_name']) ?></span>
+                    <span class="logo-sub"><?= htmlspecialchars($header['tagline']) ?></span>
+                </div>
             </div>
-            <div class="logo-text">
-                <span class="logo-main"><?= htmlspecialchars($header['business_name']) ?></span>
-                <span class="logo-sub"><?= htmlspecialchars($header['tagline']) ?></span>
-            </div>
+            <ul class="nav-links">
+                <li><a href="#beranda">Beranda</a></li>
+                <li><a href="#cara-pesan"><?= htmlspecialchars($cara_title) ?></a></li>
+                <li><a href="#tentang-kami"><?= htmlspecialchars($tentang['title']) ?></a></li>
+                <li><a href="#testimoni-section">Testimoni</a></li>
+                <li><a href="#kontak"><?= htmlspecialchars($kontak_section['title']) ?></a></li>
+            </ul>
         </div>
-        <ul class="nav-links">
-            <li><a href="#beranda">Beranda</a></li>
-            <li><a href="#cara-pesan"><?= htmlspecialchars($cara_title) ?></a></li>
-            <li><a href="#tentang-kami"><?= htmlspecialchars($tentang['title']) ?></a></li>
-            <li><a href="#testimoni-section">Testimoni</a></li>
-            <li><a href="#kontak"><?= htmlspecialchars($kontak_section['title']) ?></a></li>
-        </ul>
     </header>
 
     <main>
