@@ -265,19 +265,13 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             margin-top: -2px;
         }
 
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 1.2rem;
-            margin: 0;
-            padding: 0;
-        }
-        .nav-links a {
+.nav-links a {
             font-weight: 600;
             font-size: 1.05rem;
             position: relative;
             color: rgba(255,255,255,0.92);
             transition: var(--transition);
+            padding: 8px 0;
         }
         .nav-links a:hover {
             color: white;
@@ -288,15 +282,23 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             bottom: -4px;
             left: 0;
             width: 0;
-            height: 2px;
+            height: 3px;
             background: white;
-            border-radius: 1px;
+            border-radius: 2px;
             transition: var(--transition);
         }
         .nav-links a:hover::after {
             width: 100%;
         }
-
+        .nav-links a.active {
+            color: white;
+            font-weight: 700;
+        }
+        .nav-links a.active::after {
+            width: 100%;
+            background: var(--accent);
+            height: 3px;
+        }
         .nav-menus {
             display: flex;
             gap: 1rem;
