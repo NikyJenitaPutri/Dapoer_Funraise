@@ -174,7 +174,7 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             white-space: nowrap;
         }
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #d05876);
+            background: linear-gradient(135deg, var(--primary), #F9CC22);
             color: white;
         }
         .btn-primary:hover {
@@ -182,7 +182,7 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             box-shadow: 0 16px 40px rgba(182, 75, 98, 0.4);
         }
         .btn-secondary {
-            background: linear-gradient(135deg, var(--secondary), #7058c4);
+            background: linear-gradient(135deg, var(--secondary), #58c477ff);
             color: white;
         }
         .btn-secondary:hover {
@@ -200,14 +200,14 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             transform: translateY(-3px);
         }
 
-        /* 🔹 HEADER PREMIUM */
+        /* 🔹 HEADER — NAVBAR DI TENGAH (sesuai permintaan) */
         .app-header {
             background: linear-gradient(90deg, var(--secondary), var(--primary));
             color: white;
-            padding: 1.2rem 2rem;
+            padding: 1rem 2rem;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center; /* ✅ utama: fokus ke tengah */
             gap: 1.5rem;
             box-shadow: 0 4px 20px rgba(90, 70, 162, 0.25);
             position: sticky;
@@ -217,6 +217,7 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             overflow: hidden;
             transition: transform 0.3s ease;
         }
+
         .app-header::before {
             content: '';
             position: absolute;
@@ -227,45 +228,71 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
             z-index: 1;
         }
-        .app-header > * { position: relative; z-index: 2; }
+
+        .app-header > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Logo tetap di kiri */
         .logo {
+            margin-right: auto; /* ✅ dorong ke kiri */
             display: flex;
             align-items: center;
             gap: 14px;
             text-decoration: none;
             transition: transform 0.3s ease;
         }
-        .logo:hover { transform: scale(1.02); }
+
+        .logo:hover {
+            transform: scale(1.02);
+        }
+
         .logo-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             backdrop-filter: blur(4px);
         }
+
         .logo-text {
             display: flex;
             flex-direction: column;
         }
+
         .logo-main {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: -0.5px;
             color: white;
             text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
+
         .logo-sub {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 500;
             opacity: 0.9;
             color: rgba(255,255,255,0.95);
             margin-top: -2px;
         }
 
-.nav-links a {
+        /* Navbar utama — ditengahkan */
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
             font-weight: 600;
             font-size: 1.05rem;
             position: relative;
@@ -273,9 +300,11 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             transition: var(--transition);
             padding: 8px 0;
         }
+
         .nav-links a:hover {
             color: white;
         }
+
         .nav-links a::after {
             content: '';
             position: absolute;
@@ -287,41 +316,20 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             border-radius: 2px;
             transition: var(--transition);
         }
+
         .nav-links a:hover::after {
             width: 100%;
         }
+
         .nav-links a.active {
             color: white;
             font-weight: 700;
         }
+
         .nav-links a.active::after {
             width: 100%;
             background: var(--accent);
             height: 3px;
-        }
-        .nav-menus {
-            display: flex;
-            gap: 1rem;
-        }
-        .nav-menu {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-size: 0.98rem;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-        }
-        .nav-menu:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         /* === SECTIONS === */
