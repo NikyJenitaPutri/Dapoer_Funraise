@@ -454,9 +454,36 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
         .order-card:hover p { color: rgba(255,255,255,0.9); }
 
         /* === KONTAK === */
+        /* === KONTAK === */
         #kontak {
-            background: white;
+            background: url('assets/lotus.jpg') center/cover no-repeat;
             color: #333;
+            position: relative;
+            overflow: hidden;
+        
+        }        
+       #kontak::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }        
+        #kontak .section-title,
+        #kontak .section-subtitle,
+        #kontak .contact-cards {
+            position: relative;
+            z-index: 2;
+        }
+        #kontak .section-title {
+            color: white;
+            -webkit-text-fill-color: white;
+        }
+        #kontak .section-subtitle {
+            color: rgba(255, 255, 255, 0.95);
         }
         .contact-cards {
             display: grid;
@@ -513,6 +540,7 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
             margin-top: 10px;
             font-weight: 700;
         }
+
 
         /* === TESTIMONI & FORM COMBINED === */
         #testimoni-section {
@@ -1043,9 +1071,14 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
     <main>
         <section id="beranda" class="fade-in">
             <div class="hero-content">
-                <a href="produk.php" class="btn btn-primary">
-                    <i class="fa-solid fa-cookie-bite"></i> <?= htmlspecialchars($cta_text) ?>
-                </a>
+                <div style="display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                    <a href="produk.php" class="btn btn-primary">
+                        <i class="fa-solid fa-cookie-bite"></i> <?= htmlspecialchars($cta_text) ?>
+                    </a>
+                    <a href="https://wa.me/+6283129704643?text=Halo,%20saya%20ingin%20memesan%20produk%20Dapoer%20Funraise" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-brands fa-whatsapp"></i> Pesan Sekarang
+                    </a>
+                </div>
             </div>
         </section>
 
@@ -1238,7 +1271,7 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
         </p>
     </footer>
 
-    <script>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
         // ▼▼▼ 1–8. Fade-in, smooth scroll, carousel, WA, etc. (tidak diubah) ▼▼▼
         if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
@@ -1258,19 +1291,84 @@ $contact_cards = $stmtCards->fetchAll(PDO::FETCH_ASSOC);
         const header = document.querySelector('.app-header');
         const navLinks = document.querySelectorAll('a[href^="#"]');
         function getHeaderHeight() { return header ? header.offsetHeight : 80; }
+        
+        // 🆕 FITUR BARU: Auto-update active nav saat scroll
+        const sections = document.querySelectorAll('section[id]');
+        
+        // Method 1: Intersection Observer (lebih smooth)
+        const navObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    updateActiveNav(id);
+                }
+            });
+        }, { 
+            threshold: 0.2,
+            rootMargin: `-${Math.floor(getHeaderHeight())}px 0px -60% 0px`
+        });
+        
+        sections.forEach(section => navObserver.observe(section));
+        
+        // Method 2: Scroll-based fallback (backup untuk edge cases)
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                const scrollPos = window.scrollY + getHeaderHeight() + 100;
+                
+                let currentSection = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.offsetHeight;
+                    
+                    if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                        currentSection = section.getAttribute('id');
+                    }
+                });
+                
+                if (currentSection) {
+                    updateActiveNav(currentSection);
+                }
+            }, 100);
+        }, { passive: true });
+        
+        // Helper function untuk update active nav
+        function updateActiveNav(id) {
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            const activeLink = document.querySelector(`.nav-links a[href="#${id}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        }
+        
+        sections.forEach(section => navObserver.observe(section));
+        
         navLinks.forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
+           anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 const targetId = this.getAttribute('href');
                 if (!targetId || targetId === '#') return;
                 const target = document.querySelector(targetId);
                 if (!target) return;
-                const offset = getHeaderHeight() + 20;
-                const targetPosition = target.getBoundingClientRect().top + window.scrollY;
-                const scrollPosition = targetPosition - offset;
-                window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
-            });
-        });
+                
+                // Hapus active dari semua nav items
+                document.querySelectorAll('.nav-links a').forEach(link => {
+                    link.classList.remove('active');
+                });
+                
+                // Tambahkan active ke yang diklik
+                this.classList.add('active');
+        
+        const offset = getHeaderHeight() + 20;
+        const targetPosition = target.getBoundingClientRect().top + window.scrollY;
+        const scrollPosition = targetPosition - offset;
+        window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
+    });
+});
 
         const carousel = document.getElementById('carouselWrapper');
         const prevBtn = document.getElementById('prevBtn');
